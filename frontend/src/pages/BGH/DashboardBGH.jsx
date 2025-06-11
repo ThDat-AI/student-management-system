@@ -70,31 +70,65 @@ const BGHDashboard = () => {
         <Row className="g-0">
           <Col className="content-area px-4 py-4">
             
-            {/* Banner chào mừng - ĐÃ SỬA LẠI */}
+            {/* Enhanced Animated Banner */}
             <div className="welcome-banner p-4 rounded-4 position-relative overflow-hidden mb-4">
+              {/* Animated Background Elements */}
+              <div className="banner-bg-animation">
+                <div className="floating-orb orb-1"></div>
+                <div className="floating-orb orb-2"></div>
+                <div className="floating-orb orb-3"></div>
+                <div className="floating-orb orb-4"></div>
+                <div className="floating-orb orb-5"></div>
+              </div>
+              
+              {/* Animated Grid Pattern */}
+              <div className="grid-pattern"></div>
+              
+              {/* Wave Animation */}
+              <div className="wave-animation">
+                <div className="wave wave-1"></div>
+                <div className="wave wave-2"></div>
+                <div className="wave wave-3"></div>
+              </div>
+              
+              {/* Particle Effects */}
+              <div className="particles">
+                <div className="particle particle-1"></div>
+                <div className="particle particle-2"></div>
+                <div className="particle particle-3"></div>
+                <div className="particle particle-4"></div>
+                <div className="particle particle-5"></div>
+                <div className="particle particle-6"></div>
+              </div>
+
               <div className="welcome-content">
                 <div className="d-flex align-items-center">
-                  {/* Avatar Section - Bên trái */}
+                  {/* Enhanced Avatar Section */}
                   <div className="banner-avatar-section me-4">
                     <div className="avatar-container">
                       <div className="avatar-main">
                         <div className="avatar-placeholder">
-                          <FaUserTie size={32} className="text-white" />
+                          <FaUserTie size={32} className="text-white avatar-icon" />
                         </div>
                       </div>
-                      <div className="avatar-ring"></div>
-                      <div className="avatar-pulse"></div>
+                      <div className="avatar-ring ring-1"></div>
+                      <div className="avatar-ring ring-2"></div>
+                      <div className="avatar-pulse pulse-1"></div>
+                      <div className="avatar-pulse pulse-2"></div>
+                      <div className="avatar-glow"></div>
                     </div>
                   </div>
                   
-                  {/* Text content - Bên phải */}
+                  {/* Enhanced Text content */}
                   <div className="flex-grow-1">
-                    <h2 className="text-white mb-1 fw-bold">Chào mừng, Ban Giám Hiệu!</h2>
-                    <p className="text-white-75 mb-0">Quản lý và giám sát hoạt động của hệ thống một cách hiệu quả</p>
+                    <h2 className="text-white mb-1 fw-bold banner-title">Chào mừng, Ban Giám Hiệu!</h2>
+                    <p className="text-white-75 mb-0 banner-subtitle">Quản lý và giám sát hoạt động của hệ thống một cách hiệu quả</p>
                   </div>
                 </div>
               </div>
-              <div className="banner-pattern"></div>
+              
+              {/* Shimmer Effect */}
+              <div className="shimmer-effect"></div>
             </div>
 
             {/* Chức năng chính */}
@@ -140,7 +174,7 @@ const BGHDashboard = () => {
         </Row>
       </Container>
 
-      {/* Enhanced CSS Styles - ĐÃ SỬA */}
+      {/* Enhanced CSS Styles with Animations */}
       <style type="text/css">
         {`
           .dashboard-container { 
@@ -152,62 +186,272 @@ const BGHDashboard = () => {
             padding-top: 1.5rem; 
           }
 
-          /* BANNER - ĐÃ SỬA HOÀN TOÀN */
+          /* ENHANCED ANIMATED BANNER */
           .welcome-banner { 
-            background: linear-gradient(135deg, #3a36db 0%, #4361ee 100%); 
-            box-shadow: 0 10px 20px rgba(67, 97, 238, 0.15);
-            border-radius: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+            border-radius: 20px;
             position: relative;
             overflow: hidden;
+            animation: bannerGlow 4s ease-in-out infinite alternate;
+          }
+
+          @keyframes bannerGlow {
+            0% { 
+              box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+            }
+            100% { 
+              box-shadow: 0 25px 50px rgba(102, 126, 234, 0.4);
+            }
           }
           
           .welcome-content {
             position: relative;
-            z-index: 10;
+            z-index: 20;
+            animation: slideInUp 1s ease-out;
           }
-          
-          .banner-pattern {
+
+          @keyframes slideInUp {
+            0% {
+              transform: translateY(30px);
+              opacity: 0;
+            }
+            100% {
+              transform: translateY(0);
+              opacity: 1;
+            }
+          }
+
+          /* FLOATING ORBS */
+          .banner-bg-animation {
             position: absolute;
             top: 0;
-            right: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            background-image: 
-              radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%), 
-              radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
-            opacity: 0.3;
             z-index: 1;
           }
 
-          .welcome-banner h2, 
-          .welcome-banner p {
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-            position: relative;
-            z-index: 10;
-          }
-          
-          .text-white-75 {
-            color: rgba(255, 255, 255, 0.85) !important;
-          }
-          
-          .welcome-icon { 
-            width: 56px; 
-            height: 56px;
-            position: relative;
-            z-index: 10;
-            backdrop-filter: blur(10px);
+          .floating-orb {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            animation: floatOrb 20s ease-in-out infinite;
           }
 
-          /* AVATAR SECTION */
-          .banner-avatar-section {
-            position: relative;
-            z-index: 10;
+          .orb-1 {
+            width: 80px;
+            height: 80px;
+            top: 10%;
+            left: 5%;
+            animation-delay: 0s;
           }
 
+          .orb-2 {
+            width: 60px;
+            height: 60px;
+            top: 60%;
+            left: 80%;
+            animation-delay: -5s;
+          }
+
+          .orb-3 {
+            width: 40px;
+            height: 40px;
+            top: 20%;
+            left: 70%;
+            animation-delay: -10s;
+          }
+
+          .orb-4 {
+            width: 50px;
+            height: 50px;
+            top: 80%;
+            left: 10%;
+            animation-delay: -15s;
+          }
+
+          .orb-5 {
+            width: 30px;
+            height: 30px;
+            top: 40%;
+            left: 50%;
+            animation-delay: -7s;
+          }
+
+          @keyframes floatOrb {
+            0%, 100% {
+              transform: translateY(0px) translateX(0px) rotate(0deg);
+            }
+            25% {
+              transform: translateY(-20px) translateX(10px) rotate(90deg);
+            }
+            50% {
+              transform: translateY(-40px) translateX(-10px) rotate(180deg);
+            }
+            75% {
+              transform: translateY(-20px) translateX(-20px) rotate(270deg);
+            }
+          }
+
+          /* GRID PATTERN */
+          .grid-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+              linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+            animation: gridMove 30s linear infinite;
+            z-index: 2;
+          }
+
+          @keyframes gridMove {
+            0% {
+              transform: translate(0, 0);
+            }
+            100% {
+              transform: translate(20px, 20px);
+            }
+          }
+
+          /* WAVE ANIMATION */
+          .wave-animation {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 3;
+          }
+
+          .wave {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: waveMove 15s ease-in-out infinite;
+          }
+
+          .wave-1 {
+            animation-delay: 0s;
+          }
+
+          .wave-2 {
+            animation-delay: -5s;
+          }
+
+          .wave-3 {
+            animation-delay: -10s;
+          }
+
+          @keyframes waveMove {
+            0% {
+              transform: translateX(-100%);
+            }
+            100% {
+              transform: translateX(50%);
+            }
+          }
+
+          /* PARTICLE EFFECTS */
+          .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 4;
+          }
+
+          .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            animation: particleFloat 10s ease-in-out infinite;
+          }
+
+          .particle-1 {
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+          }
+
+          .particle-2 {
+            top: 40%;
+            left: 20%;
+            animation-delay: -2s;
+          }
+
+          .particle-3 {
+            top: 60%;
+            left: 30%;
+            animation-delay: -4s;
+          }
+
+          .particle-4 {
+            top: 30%;
+            left: 80%;
+            animation-delay: -6s;
+          }
+
+          .particle-5 {
+            top: 70%;
+            left: 70%;
+            animation-delay: -8s;
+          }
+
+          .particle-6 {
+            top: 50%;
+            left: 90%;
+            animation-delay: -3s;
+          }
+
+          @keyframes particleFloat {
+            0%, 100% {
+              transform: translateY(0px) scale(1);
+              opacity: 0.6;
+            }
+            50% {
+              transform: translateY(-30px) scale(1.2);
+              opacity: 1;
+            }
+          }
+
+          /* SHIMMER EFFECT */
+          .shimmer-effect {
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: shimmer 3s ease-in-out infinite;
+            z-index: 15;
+          }
+
+          @keyframes shimmer {
+            0% {
+              left: -100%;
+            }
+            100% {
+              left: 100%;
+            }
+          }
+
+          /* ENHANCED AVATAR ANIMATIONS */
           .avatar-container {
             position: relative;
             width: 80px;
             height: 80px;
+            z-index: 10;
           }
 
           .avatar-main {
@@ -219,22 +463,36 @@ const BGHDashboard = () => {
             height: 64px;
             background: rgba(255, 255, 255, 0.15);
             border-radius: 50%;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(15px);
             border: 2px solid rgba(255, 255, 255, 0.3);
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 3;
+            z-index: 10;
+            animation: avatarBounce 2s ease-in-out infinite alternate;
           }
 
-          .avatar-placeholder {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(45deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+          @keyframes avatarBounce {
+            0% {
+              transform: translate(-50%, -50%) scale(1);
+            }
+            100% {
+              transform: translate(-50%, -50%) scale(1.05);
+            }
+          }
+
+          .avatar-icon {
+            animation: iconRotate 4s ease-in-out infinite;
+            transform-origin: center;
+          }
+
+          @keyframes iconRotate {
+            0%, 100% {
+              transform: rotate(0deg);
+            }
+            50% {
+              transform: rotate(10deg);
+            }
           }
 
           .avatar-ring {
@@ -242,12 +500,32 @@ const BGHDashboard = () => {
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 72px;
-            height: 72px;
             border-radius: 50%;
             border: 2px solid rgba(255, 255, 255, 0.4);
-            z-index: 2;
-            animation: avatarRotate 8s linear infinite;
+          }
+
+          .ring-1 {
+            width: 72px;
+            height: 72px;
+            animation: ringRotate 8s linear infinite;
+            z-index: 8;
+          }
+
+          .ring-2 {
+            width: 84px;
+            height: 84px;
+            animation: ringRotate 12s linear infinite reverse;
+            z-index: 7;
+            border-style: dashed;
+          }
+
+          @keyframes ringRotate {
+            0% {
+              transform: translate(-50%, -50%) rotate(0deg);
+            }
+            100% {
+              transform: translate(-50%, -50%) rotate(360deg);
+            }
           }
 
           .avatar-pulse {
@@ -255,28 +533,91 @@ const BGHDashboard = () => {
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 80px;
-            height: 80px;
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.1);
-            z-index: 1;
-            animation: avatarPulse 3s ease-in-out infinite;
           }
 
-          @keyframes avatarRotate {
-            0% { transform: translate(-50%, -50%) rotate(0deg); }
-            100% { transform: translate(-50%, -50%) rotate(360deg); }
+          .pulse-1 {
+            width: 80px;
+            height: 80px;
+            animation: pulseEffect 3s ease-in-out infinite;
+            z-index: 5;
           }
 
-          @keyframes avatarPulse {
-            0%, 100% { 
+          .pulse-2 {
+            width: 90px;
+            height: 90px;
+            animation: pulseEffect 3s ease-in-out infinite;
+            animation-delay: 1.5s;
+            z-index: 4;
+          }
+
+          @keyframes pulseEffect {
+            0%, 100% {
               transform: translate(-50%, -50%) scale(1);
               opacity: 0.3;
             }
-            50% { 
-              transform: translate(-50%, -50%) scale(1.1);
+            50% {
+              transform: translate(-50%, -50%) scale(1.2);
               opacity: 0.1;
             }
+          }
+
+          .avatar-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            animation: glowEffect 4s ease-in-out infinite alternate;
+            z-index: 3;
+          }
+
+          @keyframes glowEffect {
+            0% {
+              opacity: 0.3;
+              transform: translate(-50%, -50%) scale(1);
+            }
+            100% {
+              opacity: 0.6;
+              transform: translate(-50%, -50%) scale(1.1);
+            }
+          }
+
+          /* ENHANCED TEXT ANIMATIONS */
+          .banner-title {
+            animation: titleGlow 3s ease-in-out infinite alternate;
+          }
+
+          @keyframes titleGlow {
+            0% {
+              text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            }
+            100% {
+              text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), 0 0 20px rgba(255, 255, 255, 0.2);
+            }
+          }
+
+          .banner-subtitle {
+            animation: slideInLeft 1s ease-out 0.5s both;
+          }
+
+          @keyframes slideInLeft {
+            0% {
+              transform: translateX(-30px);
+              opacity: 0;
+            }
+            100% {
+              transform: translateX(0);
+              opacity: 1;
+            }
+          }
+          
+          .text-white-75 {
+            color: rgba(255, 255, 255, 0.85) !important;
           }
           
           /* STAT CARDS */
@@ -370,14 +711,33 @@ const BGHDashboard = () => {
               height: 48px;
             }
 
-            .avatar-ring {
+            .ring-1 {
               width: 54px;
               height: 54px;
             }
 
-            .avatar-pulse {
+            .ring-2 {
+              width: 64px;
+              height: 64px;
+            }
+
+            .pulse-1 {
               width: 60px;
               height: 60px;
+            }
+
+            .pulse-2 {
+              width: 70px;
+              height: 70px;
+            }
+
+            .avatar-glow {
+              width: 80px;
+              height: 80px;
+            }
+
+            .floating-orb {
+              display: none;
             }
           }
 
@@ -392,14 +752,44 @@ const BGHDashboard = () => {
               height: 56px;
             }
 
-            .avatar-ring {
+            .ring-1 {
               width: 64px;
               height: 64px;
             }
 
-            .avatar-pulse {
+            .ring-2 {
+              width: 74px;
+              height: 74px;
+            }
+
+            .pulse-1 {
               width: 70px;
               height: 70px;
+            }
+
+            .pulse-2 {
+              width: 80px;
+              height: 80px;
+            }
+
+            .avatar-glow {
+              width: 90px;
+              height: 90px;
+            }
+          }
+
+          /* PERFORMANCE OPTIMIZATION */
+          .welcome-banner * {
+            will-change: transform;
+          }
+
+          @media (prefers-reduced-motion: reduce) {
+            .welcome-banner *,
+            .welcome-banner *::before,
+            .welcome-banner *::after {
+              animation-duration: 0.01ms !important;
+              animation-iteration-count: 1 !important;
+              transition-duration: 0.01ms !important;
             }
           }
         `}
