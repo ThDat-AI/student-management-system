@@ -164,13 +164,13 @@ CORS_ALLOWS_CREDENTIALS = True
 
 # Cấu hình email (dành cho môi trường phát triển)
 # Email sẽ được in ra console nơi bạn chạy 'runserver'
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Cấu hình email (dành cho production - ví dụ với Gmail)
 # BỎ COMMENT VÀ THAY ĐỔI KHI DEPLOY
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = '23520251@gm.uit.edu.vn'  # Email của bạn
-EMAIL_HOST_PASSWORD = 'uwluhzqwslqvjjqn' # Mật khẩu ứng dụng của Gmail
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = ''  # Email của bạn
+# EMAIL_HOST_PASSWORD = '' # Mật khẩu ứng dụng của Gmail
