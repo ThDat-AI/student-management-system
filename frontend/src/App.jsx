@@ -15,6 +15,7 @@ import NotFound from "./pages/Common/NotFound";
 import Unauthorized from "./pages/Common/Unauthorized";
 import BGHDashboard from "./pages/BGH/BGHDashboard";
 import AccountManagement from "./pages/BGH/AccountManagement/AccountManagement";
+import QuyDinhManagement from "./pages/BGH/QuyDinhManagement";
 import GiaoVuDashboard from "./pages/GiaoVu/GiaoVuDashboard";
 import GiaoVienDashboard from "./pages/GiaoVien/GiaoVienDashboard";
 
@@ -42,6 +43,7 @@ function App() {
                 <Route element={<ProtectedRoute allowedRoles={["BGH"]} />}>
                   <Route path="bgh" element={<BGHDashboard />} />
                   <Route path="bgh/taikhoan" element={<AccountManagement />} />
+                  <Route path="/bgh/quydinh" element={<QuyDinhManagement />} />
                 </Route>
 
                 <Route element={<ProtectedRoute allowedRoles={["GiaoVu"]} />}>

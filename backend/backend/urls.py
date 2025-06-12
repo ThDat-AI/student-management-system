@@ -10,4 +10,6 @@ urlpatterns = [
     # Điều hướng đến các app tương ứng
     path("api/auth/", include("authentication.urls")),
     path("api/accounts/", include("accounts.urls")),
+
+    path("api/configurations/", include("configurations.urls")),
 ]
