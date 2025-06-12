@@ -6,12 +6,7 @@ export const useLayout = () => useContext(LayoutContext);
 
 export const LayoutProvider = ({ children }) => {
   const [pageTitle, setPageTitle] = useState('Dashboard');
-
-  const value = {
-    pageTitle,
-    setPageTitle,
-  };
-
+  const value = { pageTitle, setPageTitle };
   return (
     <LayoutContext.Provider value={value}>
       {children}

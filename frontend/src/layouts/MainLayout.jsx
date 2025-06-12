@@ -1,15 +1,15 @@
-// src/layouts/MainLayout.jsx
 import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import SharedNavbar from '../components/SharedNavbar';
 import ProfileModal from '../components/ProfileModal';
 import { useLayout } from '../contexts/LayoutContext';
-import { useAuth } from '../contexts/AuthContext'; // Import useAuth
+import { useAuth } from '../contexts/AuthContext';
+import { Spinner, Container } from 'react-bootstrap';
 
 const MainLayout = () => {
     const [showProfileModal, setShowProfileModal] = useState(false);
     const { pageTitle } = useLayout();
-    const { user, logout, loading } = useAuth(); // Lấy user và hàm logout từ context
+    const { user, logout, loading } = useAuth();
 
     const getDashboardPath = (role) => {
         switch (role) {
@@ -21,26 +21,32 @@ const MainLayout = () => {
     };
 
     if (loading) {
-        return <div>Đang tải ứng dụng...</div>; // Hoặc một component Spinner toàn trang
+        return (
+            <Container className="d-flex justify-content-center align-items-center vh-100">
+                <Spinner animation="border" variant="primary" />
+            </Container>
+        );
     }
 
     return (
-        <>
+        <div className="d-flex flex-column min-vh-100">
             <SharedNavbar
                 pageTitle={pageTitle}
-                user={user} // Truyền cả object user xuống
-                dashboardPath={getDashboardPath(user?.MaVaiTro?.MaVaiTro)}
-                onLogout={logout} // Truyền hàm logout từ context
+                user={user}
+                dashboardPath={getDashboardPath(user?.role)}
+                onLogout={logout}
                 onProfileClick={() => setShowProfileModal(true)}
             />
-            <main>
+            <main className="flex-grow-1">
                 <Outlet />
             </main>
-            <ProfileModal
-                show={showProfileModal}
-                onHide={() => setShowProfileModal(false)}
-            />
-        </>
+            {showProfileModal && (
+                <ProfileModal
+                    show={showProfileModal}
+                    onHide={() => setShowProfileModal(false)}
+                />
+            )}
+        </div>
     );
 };
 

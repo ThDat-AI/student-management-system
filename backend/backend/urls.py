@@ -1,16 +1,13 @@
-# urls.py
+# your_project/urls.py
+
 from django.contrib import admin
 from django.urls import path, include
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from api.custom_token import CustomTokenObtainPairView
-
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-
-    path("api/token/", CustomTokenObtainPairView.as_view(), name="get_token"),
-    path("api/token/refresh/", TokenRefreshView.as_view(), name="refresh"),
-
     path("api-auth/", include("rest_framework.urls")),
-    path("api/", include("api.urls")),
+
+    # Điều hướng đến các app tương ứng
+    path("api/auth/", include("authentication.urls")),
+    path("api/accounts/", include("accounts.urls")),
 ]
