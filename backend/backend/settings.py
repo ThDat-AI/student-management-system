@@ -104,6 +104,8 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+"""
+TUI TẮT CÁI SQL LÀM THỬ CÁI CÓ GÌ XONG XOÁ COMMENT BẬT CHẠY NHƯ THƯỜNG NHA!
 DATABASES = {
     'default': {
         'ENGINE': 'mssql',
@@ -116,6 +118,15 @@ DATABASES = {
         'OPTIONS': {
             'driver': 'ODBC Driver 17 for SQL Server',  # Kiểm tra máy bạn có cài đúng driver chưa
         },
+    }
+}
+
+"""
+#XÀI TẠM SQLITE!
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
