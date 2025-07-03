@@ -6,8 +6,8 @@ from .views import (
     KhoiDropdownView,
     NienKhoaDropdownView,
     ToHopDropdownView,
-    ThemHocSinhVaoLopView,        
-    XuatDanhSachLopView            
+    ThemHocSinhVaoLopView,         # ✅ thêm dòng này
+    XuatDanhSachLopView            # ✅ thêm dòng này
 )
 
 urlpatterns = [
@@ -18,7 +18,7 @@ urlpatterns = [
     path('dropdown/nienkhoa/', NienKhoaDropdownView.as_view()),      # UC06-06
     path('dropdown/tohop/', ToHopDropdownView.as_view()),            # UC06-07
 
-   
+    # ✅ Các tính năng mới:
     path('<int:pk>/them-hocsinh/', ThemHocSinhVaoLopView.as_view()),     # UC06-08
     path('<int:pk>/xuat-danh-sach/', XuatDanhSachLopView.as_view()),     # UC06-09
 ]

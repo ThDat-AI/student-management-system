@@ -14,5 +14,6 @@ urlpatterns = [
     path("api/configurations/", include("configurations.urls")),
     
     path('api/diem/', include('grading.urls')),
+    path("api/classes/", include("classes.urls")),
     path("", home),  # Đảm bảo hàm home đã được định nghĩa phía trên
 ]

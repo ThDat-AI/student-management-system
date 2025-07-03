@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 
 class Khoi(models.Model):
     TenKhoi = models.CharField(max_length=10, unique=True) # VD: "Khối 10", "Khối 11"
