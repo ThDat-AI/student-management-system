@@ -17,16 +17,13 @@ class DiemSo(models.Model):
     IDMonHoc = models.ForeignKey('subjects.MonHoc', on_delete=models.CASCADE)
     IDHocKy = models.ForeignKey(HocKy, on_delete=models.PROTECT)
 
-    # Các loại điểm
     DiemMieng = models.FloatField(null=True, blank=True)
     Diem15 = models.FloatField(null=True, blank=True)
     Diem1Tiet = models.FloatField(null=True, blank=True)
     DiemThi = models.FloatField(null=True, blank=True)
 
-    # Điểm trung bình (tự tính)
     DiemTB = models.FloatField(null=True, blank=True)
 
-    # Thông tin người nhập/sửa
     NguoiCapNhat = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     NgayCapNhat = models.DateTimeField(auto_now=True)
 
@@ -49,3 +46,20 @@ class DiemSoLichSu(models.Model):
 
     class Meta:
         db_table = 'DIEMSO_LICHSU'
+
+
+# ✅ Model tổng kết học kỳ mới thêm
+class TongKetHocKy(models.Model):
+    IDHocSinh = models.ForeignKey('students.HocSinh', on_delete=models.CASCADE)
+    IDLopHoc = models.ForeignKey('classes.LopHoc', on_delete=models.CASCADE)
+    IDHocKy = models.ForeignKey(HocKy, on_delete=models.CASCADE)
+
+    DiemTBHocKy = models.FloatField(null=True, blank=True)
+    HocLuc = models.CharField(max_length=20)
+
+    class Meta:
+        db_table = 'TONGKET_HOCKY'
+        unique_together = ('IDHocSinh', 'IDLopHoc', 'IDHocKy')
+
+    def __str__(self):
+        return f'{self.IDHocSinh} - {self.IDHocKy}: {self.HocLuc}'

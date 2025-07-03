@@ -1,40 +1,70 @@
 from rest_framework import serializers
-from .models import DiemSo
+from .models import DiemSo, DiemSoLichSu
 
 class DiemSoSerializer(serializers.ModelSerializer):
     class Meta:
         model = DiemSo
         fields = '__all__'
+        read_only_fields = ['DiemTB', 'NgayCapNhat', 'NguoiCapNhat']
 
     def validate(self, data):
-        # Kiểm tra tất cả các điểm nếu có
         for field in ['DiemMieng', 'Diem15', 'Diem1Tiet', 'DiemThi']:
             diem = data.get(field)
             if diem is not None and (diem < 0 or diem > 10):
                 raise serializers.ValidationError({field: f"{field} phải trong khoảng 0 - 10"})
-
         return data
 
     def create(self, validated_data):
-        # Tự động tính điểm trung bình khi tạo mới
-        diem_tb = self.tinh_diem_tb(validated_data)
-        validated_data['DiemTB'] = diem_tb
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            validated_data['NguoiCapNhat'] = request.user
+
+        validated_data['DiemTB'] = self.tinh_diem_tb(validated_data)
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
-        # Tự động tính lại điểm TB khi cập nhật
+        # Ghi lại điểm cũ để so sánh
+        old_data = {
+            'DiemMieng': instance.DiemMieng,
+            'Diem15': instance.Diem15,
+            'Diem1Tiet': instance.Diem1Tiet,
+            'DiemThi': instance.DiemThi,
+        }
+
+        # Tính lại điểm TB
         diem_tb = self.tinh_diem_tb(validated_data, instance)
         validated_data['DiemTB'] = diem_tb
-        return super().update(instance, validated_data)
+
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            validated_data['NguoiCapNhat'] = request.user
+
+        # Cập nhật điểm
+        instance = super().update(instance, validated_data)
+
+        # So sánh và ghi lịch sử nếu có thay đổi
+        changes = []
+        for field in old_data:
+            old = old_data[field]
+            new = getattr(instance, field)
+            if old != new:
+                changes.append(f"{field}: {old} → {new}")
+
+        if changes and request:
+            DiemSoLichSu.objects.create(
+                DiemGoc=instance,
+                NguoiThayDoi=request.user,
+                NoiDungThayDoi=', '.join(changes)
+            )
+
+        return instance
 
     def tinh_diem_tb(self, data, instance=None):
-        # Lấy điểm từ validated_data hoặc từ instance nếu không có
         diem_mieng = data.get('DiemMieng', getattr(instance, 'DiemMieng', None))
         diem_15 = data.get('Diem15', getattr(instance, 'Diem15', None))
         diem_1tiet = data.get('Diem1Tiet', getattr(instance, 'Diem1Tiet', None))
         diem_thi = data.get('DiemThi', getattr(instance, 'DiemThi', None))
 
-        # Hệ số mẫu: miệng(1), 15p(1), 1 tiết(2), thi(3)
         thanh_phan = [
             (diem_mieng, 1),
             (diem_15, 1),

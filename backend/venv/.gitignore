@@ -1,0 +1,22 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django SQLite DB
+db.sqlite3
+
+# Virtual environment
+venv/
+
+# Environment variables
+.env
+
+# VSCode / PyCharm / MacOS metadata (nếu bạn dùng)
+.vscode/
+.idea/
+.DS_Store
+
+# Migrations cache (optional)
+**/__pycache__/
+*.log

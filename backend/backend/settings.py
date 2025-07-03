@@ -104,29 +104,18 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-"""
-TUI TẮT CÁI SQL LÀM THỬ CÁI CÓ GÌ XONG XOÁ COMMENT BẬT CHẠY NHƯ THƯỜNG NHA!
+
 DATABASES = {
     'default': {
         'ENGINE': 'mssql',
-        'NAME': 'QuanLyHocSinhDB',         # <-- thay bằng tên database bạn
-        'USER': 'admin',  # <-- tài khoản SQL Server
-        'PASSWORD': 'admin',
-        'HOST': 'localhost',       # hoặc địa chỉ IP server SQL
+        'NAME': 'QuanLyHocSinhDB',
+        'HOST': 'localhost',
         'PORT': '1433',
-
         'OPTIONS': {
-            'driver': 'ODBC Driver 17 for SQL Server',  # Kiểm tra máy bạn có cài đúng driver chưa
+            'driver': 'ODBC Driver 17 for SQL Server',
+            'trusted_connection': 'yes',
+            'extra_params': 'TrustServerCertificate=yes;',
         },
-    }
-}
-
-"""
-#XÀI TẠM SQLITE!
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
