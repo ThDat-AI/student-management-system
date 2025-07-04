@@ -1,5 +1,6 @@
 from django.urls import path
 from .views import (
+    LopHocListView,
     LopHocListCreateView,
     LopHocDeleteView,
     LopHocUpdateView,
@@ -21,4 +22,8 @@ urlpatterns = [
     # ✅ Các tính năng mới:
     path('<int:pk>/them-hocsinh/', ThemHocSinhVaoLopView.as_view()),     # UC06-08
     path('<int:pk>/xuat-danh-sach/', XuatDanhSachLopView.as_view()),     # UC06-09
+
+    #Bảo làm
+    path("lop/", LopHocListCreateView.as_view()),
+    path('lop/', LopHocListView.as_view()),
 ]

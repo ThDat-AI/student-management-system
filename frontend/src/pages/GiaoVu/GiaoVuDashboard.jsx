@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Container, Row, Col, Card, Button } from "react-bootstrap";
-import { FaUsers, FaSchool, FaFileExport, FaChartBar } from "react-icons/fa";
+import { FaUsers, FaSchool, FaFileExport, FaChartBar, FaClipboardList } from "react-icons/fa";
 import { useLayout } from "../../contexts/LayoutContext";
 import '../../assets/styles/GiaoVuDashboard.css';
 
@@ -13,36 +13,51 @@ const GiaoVuDashboard = () => {
     setPageTitle("Bảng điều khiển (Giáo vụ)");
   }, [setPageTitle]);
 
-  const menuItems = [
-    { 
-      title: "Quản lý học sinh", 
-      description: "Thêm, sửa, xóa thông tin học sinh trong hệ thống.", 
-      icon: <FaUsers />, 
-      color: "primary", 
-      path: "/giaovu/quan-ly-hoc-sinh" 
-    },
-    { 
-      title: "Quản lý lớp học", 
-      description: "Sắp xếp, quản lý các lớp học và phân công giáo viên.", 
-      icon: <FaSchool />, 
-      color: "success", 
-      path: "/giaovu/quan-ly-lop-hoc" 
-    },
-    { 
-      title: "Lập danh sách lớp", 
-      description: "Tạo và xuất danh sách học sinh của các lớp.", 
-      icon: <FaFileExport />, 
-      color: "warning", 
-      path: "/giaovu/lap-danh-sach-lop" 
-    },
-    { 
-      title: "Lập báo cáo thống kê", 
-      description: "Tạo báo cáo về học sinh, lớp học và hiệu quả giảng dạy.", 
-      icon: <FaChartBar />, 
-      color: "info", 
-      path: "/giaovu/bao-cao-thong-ke" 
-    },
-  ];
+const menuItems = [
+  { 
+    title: "Quản lý học sinh", 
+    description: "Thêm, sửa, xóa thông tin học sinh trong hệ thống.", 
+    icon: <FaUsers />, 
+    color: "primary", 
+    path: "/giaovu/quan-ly-hoc-sinh" 
+  },
+  { 
+    title: "Quản lý lớp học", 
+    description: "Sắp xếp, quản lý các lớp học và phân công giáo viên.", 
+    icon: <FaSchool />, 
+    color: "success", 
+    path: "/giaovu/quan-ly-lop-hoc" 
+  },
+  { 
+    title: "Lập danh sách lớp", 
+    description: "Tạo và xuất danh sách học sinh của các lớp.", 
+    icon: <FaFileExport />, 
+    color: "warning", 
+    path: "/giaovu/lap-danh-sach-lop" 
+  },
+  { 
+    title: "Lập báo cáo thống kê", 
+    description: "Tạo báo cáo về học sinh, lớp học và hiệu quả giảng dạy.", 
+    icon: <FaChartBar />, 
+    color: "info", 
+    path: "/giaovu/bao-cao-thong-ke" 
+  },
+  {
+    title: "Tổng hợp điểm học kỳ",
+    description: "Tổng hợp điểm theo lớp, khối hoặc toàn trường.",
+    icon: <FaClipboardList />,
+    color: "danger",
+    path: "/giaovu/tong-hop-diem"
+  },
+  {
+  title: "Xuất báo cáo điểm",
+  description: "Tạo và tải báo cáo điểm của học sinh theo lớp.",
+  icon: <FaFileExport />,
+  color: "secondary",
+  path: "/giaovu/xuat-bao-cao"
+  }
+];
+
 
   return (
     <div className="dashboard-container">
@@ -98,7 +113,7 @@ const GiaoVuDashboard = () => {
           <h5 className="fw-bold text-dark mb-3 border-start border-primary border-4 ps-2">Chức năng chính</h5>
           <Row className="g-4">
             {menuItems.map((item, index) => (
-              <Col xs={12} md={6} xl={3} key={index}>
+              <Col xs={12} md={6} xl={4} key={index}>
                 <Card className="function-card h-100 border-0 shadow-sm" onClick={() => navigate(item.path)}>
                   <Card.Body className="p-4 d-flex flex-column">
                     <div className="d-flex align-items-center mb-3">

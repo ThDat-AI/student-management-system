@@ -1,3 +1,5 @@
 from django.contrib import admin
+from .models import MonHoc, ToHop
 
-# Register your models here.
+admin.site.register(MonHoc)
+admin.site.register(ToHop)

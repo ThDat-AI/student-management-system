@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Container, Row, Col, Card, Button, Spinner } from "react-bootstrap";
-import { FaUsers, FaChartBar, FaCog, FaUserFriends, FaChalkboardTeacher, FaUserShield, FaUserTie } from "react-icons/fa";
+import { FaUsers, FaChartBar, FaCog, FaUserFriends, FaChalkboardTeacher, FaUserShield, FaUserTie, FaFileExport } from "react-icons/fa";
 import { useLayout } from "../../contexts/LayoutContext";
 import api from "../../api";
 import '../../assets/styles/BGHDashboard.css'; // Import a CSS file
@@ -46,12 +46,44 @@ const BGHDashboard = () => {
     fetchStats();
   }, [setPageTitle]);
 
-  const menuItems = [
-    { title: "Quản lý tài khoản", description: "Tạo, sửa, xóa các tài khoản trong hệ thống.", icon: <FaUsers />, color: "primary", path: "/bgh/taikhoan" },
-    { title: "Báo cáo & Thống kê", description: "Xem các báo cáo tổng quan về học tập và hệ thống.", icon: <FaChartBar />, color: "success", path: "/bgh/baocao" },
-    { title: "Cài đặt hệ thống", description: "Cấu hình các thông số chung của năm học, quy định.", icon: <FaCog />, color: "warning", path: "/bgh/quydinh" },
-    { title: "Quản lý lớp học", description: "Thêm, xoá lớp học và quản lý khối, tổ hợp, niên khóa.", icon: <FaChalkboardTeacher />, color: "info", path: "/bgh/lophoc" }
-  ];
+const menuItems = [
+  {
+    title: "Quản lý tài khoản",
+    description: "Tạo, sửa, xóa các tài khoản trong hệ thống.",
+    icon: <FaUsers />,
+    color: "primary",
+    path: "/bgh/taikhoan",
+  },
+  {
+    title: "Báo cáo & Thống kê",
+    description: "Xem các báo cáo tổng quan về học tập và hệ thống.",
+    icon: <FaChartBar />,
+    color: "success",
+    path: "/bgh/baocao",
+  },
+  {
+    title: "Cài đặt hệ thống",
+    description: "Cấu hình các thông số chung của năm học, quy định.",
+    icon: <FaCog />,
+    color: "warning",
+    path: "/bgh/quydinh",
+  },
+  {
+    title: "Quản lý lớp học",
+    description: "Thêm, xoá lớp học và quản lý khối, tổ hợp, niên khóa.",
+    icon: <FaChalkboardTeacher />,
+    color: "info",
+    path: "/bgh/lophoc",
+  },
+  {
+    title: "Xuất báo cáo điểm",
+    description: "Tạo và tải báo cáo điểm toàn trường theo lớp, khối, học kỳ.",
+    icon: <FaFileExport />,
+    color: "secondary",
+    path: "/bgh/xuat-bao-cao",
+  },
+];
+
 
   const quickStats = [
     { icon: <FaUserFriends />, title: "Tổng tài khoản", value: stats?.total_accounts, color: "primary" },

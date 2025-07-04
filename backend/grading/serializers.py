@@ -1,17 +1,40 @@
 from rest_framework import serializers
-from .models import DiemSo, DiemSoLichSu
+from .models import DiemSo, DiemSoLichSu, HocKy
+
+
+class HocKySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HocKy
+        fields = ['id', 'TenHocKy']
+
 
 class DiemSoSerializer(serializers.ModelSerializer):
+    # Alias để frontend dùng tên quen thuộc
+    Diem15Phut = serializers.FloatField(source='Diem15', allow_null=True, required=False)
+    DiemHocKy = serializers.FloatField(source='DiemThi', allow_null=True, required=False)
+
     class Meta:
         model = DiemSo
-        fields = '__all__'
-        read_only_fields = ['DiemTB', 'NgayCapNhat', 'NguoiCapNhat']
+        fields = [
+            'id', 'IDHocSinh', 'IDLopHoc', 'IDMonHoc', 'IDHocKy',
+            'DiemMieng', 'Diem15Phut', 'Diem1Tiet', 'DiemHocKy',
+            'DiemTB', 'NguoiCapNhat', 'NgayCapNhat'
+        ]
+        read_only_fields = ['DiemTB', 'NguoiCapNhat', 'NgayCapNhat']
 
     def validate(self, data):
-        for field in ['DiemMieng', 'Diem15', 'Diem1Tiet', 'DiemThi']:
-            diem = data.get(field)
+        # Kiểm tra các điểm trong khoảng 0 - 10 (sử dụng tên field gốc trong model)
+        fields_to_check = {
+            'DiemMieng': data.get('DiemMieng'),
+            'Diem15': data.get('Diem15'),
+            'Diem1Tiet': data.get('Diem1Tiet'),
+            'DiemThi': data.get('DiemThi'),
+        }
+
+        for field, diem in fields_to_check.items():
             if diem is not None and (diem < 0 or diem > 10):
-                raise serializers.ValidationError({field: f"{field} phải trong khoảng 0 - 10"})
+                raise serializers.ValidationError({field: f"{field} phải trong khoảng từ 0 đến 10"})
+
         return data
 
     def create(self, validated_data):
@@ -23,7 +46,7 @@ class DiemSoSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
-        # Ghi lại điểm cũ để so sánh
+        # Lưu dữ liệu cũ để kiểm tra thay đổi
         old_data = {
             'DiemMieng': instance.DiemMieng,
             'Diem15': instance.Diem15,
@@ -31,7 +54,7 @@ class DiemSoSerializer(serializers.ModelSerializer):
             'DiemThi': instance.DiemThi,
         }
 
-        # Tính lại điểm TB
+        # Tính điểm trung bình mới
         diem_tb = self.tinh_diem_tb(validated_data, instance)
         validated_data['DiemTB'] = diem_tb
 
@@ -39,10 +62,10 @@ class DiemSoSerializer(serializers.ModelSerializer):
         if request and request.user.is_authenticated:
             validated_data['NguoiCapNhat'] = request.user
 
-        # Cập nhật điểm
+        # Cập nhật
         instance = super().update(instance, validated_data)
 
-        # So sánh và ghi lịch sử nếu có thay đổi
+        # So sánh và ghi lịch sử thay đổi
         changes = []
         for field in old_data:
             old = old_data[field]
@@ -60,11 +83,13 @@ class DiemSoSerializer(serializers.ModelSerializer):
         return instance
 
     def tinh_diem_tb(self, data, instance=None):
+        # Lấy điểm từ validated_data hoặc từ instance
         diem_mieng = data.get('DiemMieng', getattr(instance, 'DiemMieng', None))
         diem_15 = data.get('Diem15', getattr(instance, 'Diem15', None))
         diem_1tiet = data.get('Diem1Tiet', getattr(instance, 'Diem1Tiet', None))
         diem_thi = data.get('DiemThi', getattr(instance, 'DiemThi', None))
 
+        # Tính trung bình có trọng số
         thanh_phan = [
             (diem_mieng, 1),
             (diem_15, 1),

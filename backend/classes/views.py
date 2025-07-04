@@ -21,6 +21,11 @@ from .serializers import (
     ToHopSerializer
 )
 
+class LopHocListView(generics.ListAPIView):
+    queryset = LopHoc.objects.all()
+    serializer_class = LopHocSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
 # ---------------------------
 # UC06-01 & UC06-04: Thêm và hiển thị danh sách lớp
 class LopHocListCreateView(generics.ListCreateAPIView):
