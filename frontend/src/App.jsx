@@ -16,8 +16,9 @@ import Unauthorized from "./pages/Common/Unauthorized";
 import BGHDashboard from "./pages/BGH/BGHDashboard";
 import AccountManagement from "./pages/BGH/AccountManagement/AccountManagement";
 import QuyDinhManagement from "./pages/BGH/QuyDinhManagement";
-import LopHocManagement from "./pages/BGH/LopHocManagement";
+import LopHocManagement from "./pages/GiaoVu/LopHocManagement";
 import GiaoVuDashboard from "./pages/GiaoVu/GiaoVuDashboard";
+import LapDanhSachLop from "./pages/GiaoVu/LapDanhSachLop";
 import GiaoVienDashboard from "./pages/GiaoVien/GiaoVienDashboard";
 
 
@@ -46,11 +47,13 @@ function App() {
                   <Route path="bgh" element={<BGHDashboard />} />
                   <Route path="bgh/taikhoan" element={<AccountManagement />} />
                   <Route path="/bgh/quydinh" element={<QuyDinhManagement />} />
-                   <Route path="bgh/lophoc" element={<LopHocManagement />} />
+                   
                 </Route>
 
                 <Route element={<ProtectedRoute allowedRoles={["GiaoVu"]} />}>
                   <Route path="giaovu" element={<GiaoVuDashboard />} />
+                  <Route path="giaovu/quan-ly-lop-hoc" element={<LopHocManagement />} />
+                  <Route path="giaovu/lap-danh-sach-lop" element={<LapDanhSachLop />} />
                 </Route>
 
                 <Route element={<ProtectedRoute allowedRoles={["GiaoVien"]} />}>

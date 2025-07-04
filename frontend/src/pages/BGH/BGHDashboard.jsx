@@ -5,7 +5,7 @@ import { Container, Row, Col, Card, Button, Spinner } from "react-bootstrap";
 import { FaUsers, FaChartBar, FaCog, FaUserFriends, FaChalkboardTeacher, FaUserShield, FaUserTie } from "react-icons/fa";
 import { useLayout } from "../../contexts/LayoutContext";
 import api from "../../api";
-import '../../assets/styles/BGHDashboard.css'; // Import a CSS file
+import '../../assets/styles/BGHDashboard.css';
 
 const StatCard = ({ icon, title, value, color, loading }) => (
   <Card className="stat-card shadow-sm border-0 h-100">
@@ -47,45 +47,62 @@ const BGHDashboard = () => {
   }, [setPageTitle]);
 
   const menuItems = [
-    { title: "Quản lý tài khoản", description: "Tạo, sửa, xóa các tài khoản trong hệ thống.", icon: <FaUsers />, color: "primary", path: "/bgh/taikhoan" },
-    { title: "Báo cáo & Thống kê", description: "Xem các báo cáo tổng quan về học tập và hệ thống.", icon: <FaChartBar />, color: "success", path: "/bgh/baocao" },
-    { title: "Cài đặt hệ thống", description: "Cấu hình các thông số chung của năm học, quy định.", icon: <FaCog />, color: "warning", path: "/bgh/quydinh" },
-    { title: "Quản lý lớp học", description: "Thêm, xoá lớp học và quản lý khối, tổ hợp, niên khóa.", icon: <FaChalkboardTeacher />, color: "info", path: "/bgh/lophoc" }
+    {
+      title: "Quản lý tài khoản",
+      description: "Tạo, sửa, xóa các tài khoản trong hệ thống.",
+      icon: <FaUsers />,
+      color: "primary",
+      path: "/bgh/taikhoan"
+    },
+    {
+      title: "Báo cáo & Thống kê",
+      description: "Xem các báo cáo tổng quan về học tập và hệ thống.",
+      icon: <FaChartBar />,
+      color: "success",
+      path: "/bgh/baocao"
+    },
+    {
+      title: "Cài đặt hệ thống",
+      description: "Cấu hình các thông số chung của năm học, quy định.",
+      icon: <FaCog />,
+      color: "warning",
+      path: "/bgh/quydinh"
+    }
   ];
 
   const quickStats = [
     { icon: <FaUserFriends />, title: "Tổng tài khoản", value: stats?.total_accounts, color: "primary" },
     { icon: <FaChalkboardTeacher />, title: "Giáo viên", value: stats?.teacher_accounts, color: "success" },
     { icon: <FaUserShield />, title: "Giáo vụ", value: stats?.giaovu_accounts, color: "info" },
-    { icon: <FaUserTie />, title: "Ban giám hiệu", value: stats?.bgh_accounts, color: "danger" },
+    { icon: <FaUserTie />, title: "Ban giám hiệu", value: stats?.bgh_accounts, color: "danger" }
   ];
 
   return (
     <div className="dashboard-container">
       <Container fluid className="px-4 py-4">
-        {/* Animated Banner */}
+        {/* Banner */}
         <div className="welcome-banner p-4 rounded-4 position-relative overflow-hidden mb-4">
-            <div className="banner-bg-animation">
-                <div className="floating-orb orb-1"></div><div className="floating-orb orb-2"></div><div className="floating-orb orb-3"></div><div className="floating-orb orb-4"></div><div className="floating-orb orb-5"></div>
+          <div className="banner-bg-animation">
+            <div className="floating-orb orb-1"></div><div className="floating-orb orb-2"></div><div className="floating-orb orb-3"></div><div className="floating-orb orb-4"></div><div className="floating-orb orb-5"></div>
+          </div>
+          <div className="grid-pattern"></div>
+          <div className="wave-animation"><div className="wave wave-1"></div><div className="wave wave-2"></div><div className="wave wave-3"></div></div>
+          <div className="particles"><div className="particle particle-1"></div><div className="particle particle-2"></div><div className="particle particle-3"></div><div className="particle particle-4"></div><div className="particle particle-5"></div><div className="particle particle-6"></div></div>
+          <div className="shimmer-effect"></div>
+          <div className="welcome-content d-flex align-items-center">
+            <div className="banner-avatar-section me-4">
+              <div className="avatar-container">
+                <div className="avatar-main"><div className="avatar-placeholder"><FaUserTie size={32} className="text-white avatar-icon" /></div></div>
+                <div className="avatar-ring ring-1"></div><div className="avatar-ring ring-2"></div>
+                <div className="avatar-pulse pulse-1"></div><div className="avatar-pulse pulse-2"></div>
+                <div className="avatar-glow"></div>
+              </div>
             </div>
-            <div className="grid-pattern"></div>
-            <div className="wave-animation"><div className="wave wave-1"></div><div className="wave wave-2"></div><div className="wave wave-3"></div></div>
-            <div className="particles"><div className="particle particle-1"></div><div className="particle particle-2"></div><div className="particle particle-3"></div><div className="particle particle-4"></div><div className="particle particle-5"></div><div className="particle particle-6"></div></div>
-            <div className="shimmer-effect"></div>
-            <div className="welcome-content d-flex align-items-center">
-                <div className="banner-avatar-section me-4">
-                    <div className="avatar-container">
-                        <div className="avatar-main"><div className="avatar-placeholder"><FaUserTie size={32} className="text-white avatar-icon" /></div></div>
-                        <div className="avatar-ring ring-1"></div><div className="avatar-ring ring-2"></div>
-                        <div className="avatar-pulse pulse-1"></div><div className="avatar-pulse pulse-2"></div>
-                        <div className="avatar-glow"></div>
-                    </div>
-                </div>
-                <div>
-                    <h2 className="text-white mb-1 fw-bold banner-title">Chào mừng, Ban Giám Hiệu!</h2>
-                    <p className="text-white-75 mb-0 banner-subtitle">Quản lý và giám sát hoạt động của hệ thống một cách hiệu quả</p>
-                </div>
+            <div>
+              <h2 className="text-white mb-1 fw-bold banner-title">Chào mừng, Ban Giám Hiệu!</h2>
+              <p className="text-white-75 mb-0 banner-subtitle">Quản lý và giám sát hoạt động của hệ thống một cách hiệu quả</p>
             </div>
+          </div>
         </div>
 
         {/* Main Functions */}
