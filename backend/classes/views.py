@@ -1,19 +1,14 @@
-from django.shortcuts import render
+from django.http import HttpResponse
 from rest_framework import generics, permissions, status, views
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
+
+from openpyxl import Workbook
 
 from .models import LopHoc, Khoi, LopHoc_HocSinh
 from configurations.models import NienKhoa, ThamSo
 from subjects.models import ToHop
 from students.models import HocSinh
-
-from openpyxl import Workbook
-from django.http import HttpResponse
-from students.models import HocSinh
-from .models import LopHoc, LopHoc_HocSinh
-
-
 from .serializers import (
     LopHocSerializer,
     KhoiSerializer,
@@ -29,11 +24,10 @@ class LopHocListCreateView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
-        # Kiểm tra sĩ số nhập vào có >= sĩ số tối thiểu không
         tham_so = ThamSo.objects.first()
         si_so_toi_thieu = tham_so.SiSoToiThieu if tham_so else 0
-
         si_so_lop = serializer.validated_data.get("SiSo", 0)
+
         if si_so_lop < si_so_toi_thieu:
             raise ValidationError(f"Sĩ số lớp phải ≥ sĩ số tối thiểu ({si_so_toi_thieu}).")
 
@@ -54,11 +48,10 @@ class LopHocUpdateView(generics.RetrieveUpdateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_update(self, serializer):
-        # Optional: Kiểm tra lại sĩ số tối thiểu khi cập nhật
         tham_so = ThamSo.objects.first()
         si_so_toi_thieu = tham_so.SiSoToiThieu if tham_so else 0
-
         si_so_lop = serializer.validated_data.get("SiSo", 0)
+
         if si_so_lop < si_so_toi_thieu:
             raise ValidationError(f"Sĩ số lớp phải ≥ sĩ số tối thiểu ({si_so_toi_thieu}).")
 
@@ -77,14 +70,12 @@ class NienKhoaDropdownView(generics.ListAPIView):
     serializer_class = NienKhoaSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-# UC06-07: Dropdown tổ hợp (nếu có)
+# UC06-07: Dropdown tổ hợp
 class ToHopDropdownView(generics.ListAPIView):
     queryset = ToHop.objects.all()
     serializer_class = ToHopSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-# ---------------------------
-# UC06-08: Thêm học sinh vào lớp
 # ---------------------------
 # UC06-08: Thêm học sinh vào lớp
 class ThemHocSinhVaoLopView(views.APIView):
@@ -97,8 +88,7 @@ class ThemHocSinhVaoLopView(views.APIView):
             return Response({"error": "Lớp học không tồn tại."}, status=404)
 
         hoc_sinh_ids = request.data.get("hoc_sinh_ids", [])
-        da_trung = []
-        da_them = []
+        da_trung, da_them = [], []
 
         for hs_id in hoc_sinh_ids:
             try:
@@ -106,6 +96,7 @@ class ThemHocSinhVaoLopView(views.APIView):
             except HocSinh.DoesNotExist:
                 continue
 
+            # Kiểm tra đã có lớp cùng niên khóa chưa
             da_co_lop = LopHoc_HocSinh.objects.filter(
                 IDHocSinh=hs,
                 IDLopHoc__IDNienKhoa=lop.IDNienKhoa
@@ -155,8 +146,6 @@ class XuatDanhSachLopView(views.APIView):
         response = HttpResponse(
             content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         )
-        response['Content-Disposition'] = f'attachment; filename=\"Lop_{lop.TenLop}.xlsx\"'
+        response['Content-Disposition'] = f'attachment; filename="Lop_{lop.TenLop}.xlsx"'
         wb.save(response)
         return response
-
-    

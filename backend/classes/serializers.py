@@ -3,23 +3,26 @@ from .models import LopHoc, Khoi
 from configurations.models import NienKhoa
 from subjects.models import ToHop
 
-# Serializers cho các bảng phụ (Dropdown)
+# ---------- Dropdown serializers ----------
 class KhoiSerializer(serializers.ModelSerializer):
     class Meta:
         model = Khoi
         fields = ['id', 'TenKhoi']
+
 
 class NienKhoaSerializer(serializers.ModelSerializer):
     class Meta:
         model = NienKhoa
         fields = ['id', 'TenNienKhoa']
 
+
 class ToHopSerializer(serializers.ModelSerializer):
     class Meta:
         model = ToHop
         fields = ['id', 'TenToHop']
 
-# Serializer chính cho lớp học
+
+# ---------- Chính: Serializer lớp học ----------
 class LopHocSerializer(serializers.ModelSerializer):
     IDKhoi_display = serializers.CharField(source='IDKhoi.TenKhoi', read_only=True)
     IDNienKhoa_display = serializers.CharField(source='IDNienKhoa.TenNienKhoa', read_only=True)

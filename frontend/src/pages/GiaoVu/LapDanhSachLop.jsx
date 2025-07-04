@@ -1,8 +1,6 @@
-// File: LapDanhSachLop.jsx
-
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { FaDownload, FaUserPlus } from "react-icons/fa";
+import { FaDownload, FaUserPlus, FaBookOpen, FaTrashAlt } from "react-icons/fa";
 
 const API_BASE = "http://localhost:8000/api/lophoc/";
 
@@ -12,6 +10,8 @@ const LapDanhSachLop = () => {
   const [dsHocSinh, setDsHocSinh] = useState([]);
   const [dsHocSinhChuaCoLop, setDsHocSinhChuaCoLop] = useState([]);
   const [selectedHocSinh, setSelectedHocSinh] = useState([]);
+  const [dsMonHoc, setDsMonHoc] = useState([]);
+  const [showMonHocModal, setShowMonHocModal] = useState(false);
 
   useEffect(() => {
     fetchLopHoc();
@@ -73,6 +73,26 @@ const LapDanhSachLop = () => {
     );
   };
 
+  const handleXemMonHoc = async () => {
+    try {
+      const res = await axios.get(`${API_BASE}${selectedLop}/mon-hoc/`);
+      setDsMonHoc(res.data);
+      setShowMonHocModal(true);
+    } catch (err) {
+      alert("Lỗi khi lấy danh sách môn học");
+    }
+  };
+
+  const handleXoaHocSinh = async (hocSinhId) => {
+    if (!window.confirm("Bạn có chắc muốn xoá học sinh này khỏi lớp?")) return;
+    try {
+      await axios.delete(`${API_BASE}${selectedLop}/xoa-hoc-sinh/${hocSinhId}/`);
+      fetchHocSinh(selectedLop);
+    } catch (err) {
+      alert("Lỗi khi xoá học sinh");
+    }
+  };
+
   return (
     <div className="container mt-4">
       <h2 className="mb-4">📋 Lập danh sách lớp</h2>
@@ -90,6 +110,9 @@ const LapDanhSachLop = () => {
         </div>
         {selectedLop && (
           <div className="col-md-6 text-end">
+            <button className="btn btn-info me-2" onClick={handleXemMonHoc}>
+              <FaBookOpen className="me-1" /> Môn học
+            </button>
             <button className="btn btn-success me-2" onClick={handleAddHocSinh}>
               <FaUserPlus className="me-1" /> Thêm học sinh
             </button>
@@ -128,14 +151,40 @@ const LapDanhSachLop = () => {
             <h5>👨‍🎓 Danh sách học sinh lớp</h5>
             <ul className="list-group">
               {dsHocSinh.map((hs) => (
-                <li key={hs.id} className="list-group-item">
+                <li key={hs.id} className="list-group-item d-flex justify-content-between align-items-center">
                   {hs.ho_ten} ({hs.ma_hoc_sinh})
+                  <button className="btn btn-sm btn-outline-danger" onClick={() => handleXoaHocSinh(hs.id)}>
+                    <FaTrashAlt />
+                  </button>
                 </li>
               ))}
               {dsHocSinh.length === 0 && (
                 <li className="list-group-item text-muted">Chưa có học sinh nào trong lớp</li>
               )}
             </ul>
+          </div>
+        </div>
+      )}
+
+      {showMonHocModal && (
+        <div className="modal d-block" style={{ backgroundColor: "#00000066" }}>
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">📘 Môn học của lớp</h5>
+                <button className="btn-close" onClick={() => setShowMonHocModal(false)} />
+              </div>
+              <div className="modal-body">
+                <ul>
+                  {dsMonHoc.map((mh) => (
+                    <li key={mh.id}>
+                      {mh.ten_mon} ({mh.ma_mon})
+                    </li>
+                  ))}
+                  {dsMonHoc.length === 0 && <p className="text-muted">Chưa có môn học nào</p>}
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
       )}
