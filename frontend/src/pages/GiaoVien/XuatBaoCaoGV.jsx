@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Container,
   Row,
@@ -6,158 +6,190 @@ import {
   Form,
   Button,
   Alert,
+  Card,
   Spinner,
 } from "react-bootstrap";
-import { useLayout } from "../../contexts/LayoutContext";
 import api from "../../api";
+import { useLayout } from "../../contexts/LayoutContext";
 
 const XuatBaoCaoGV = () => {
   const { setPageTitle } = useLayout();
-  const [monHocList, setMonHocList] = useState([]);
-  const [lopList, setLopList] = useState([]);
 
+  const [nienKhoaOptions, setNienKhoaOptions] = useState([]);
+  const [lopOptions, setLopOptions] = useState([]);
+  const [monOptions, setMonOptions] = useState([]);
+  const [hocKyOptions, setHocKyOptions] = useState([]);
+
+  const [selectedNienKhoa, setSelectedNienKhoa] = useState("");
   const [selectedLop, setSelectedLop] = useState("");
-  const [selectedMonHoc, setSelectedMonHoc] = useState("");
-  const [hocKy, setHocKy] = useState("1");
-  const [format, setFormat] = useState("excel");
+  const [selectedMon, setSelectedMon] = useState("");
+  const [selectedHocKy, setSelectedHocKy] = useState("");
+
+  const [thongBao, setThongBao] = useState("");
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState(null);
 
   useEffect(() => {
-    setPageTitle("Xuất báo cáo (Giáo viên)");
-    fetchInitialData();
+    setPageTitle("Xuất báo cáo điểm học kỳ");
+    fetchDropdowns();
   }, []);
 
-  const fetchInitialData = async () => {
+  useEffect(() => {
+    if (selectedNienKhoa) {
+      fetchLopTheoNienKhoa(selectedNienKhoa);
+    } else {
+      setLopOptions([]);
+      setSelectedLop("");
+    }
+  }, [selectedNienKhoa]);
+
+  const fetchDropdowns = async () => {
     try {
-      const [lopRes, monRes] = await Promise.all([
-        api.get("/subjects/lop-day/"),
-        api.get("/subjects/mon-day/"),
+      const [nkRes, monRes, hkRes] = await Promise.all([
+        api.get("/api/configurations/nienkhoa/"),
+        api.get("/api/subjects/monhoc/"),
+        api.get("/api/grading/hocky/"),
       ]);
-      setLopList(lopRes.data);
-      setMonHocList(monRes.data);
+      setNienKhoaOptions(nkRes.data);
+      setMonOptions(monRes.data);
+      setHocKyOptions(hkRes.data);
     } catch (error) {
-      console.error("Lỗi tải dữ liệu ban đầu:", error);
+      console.error("Lỗi tải danh sách:", error);
+      setThongBao("❌ Lỗi khi tải dữ liệu danh sách.");
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const fetchLopTheoNienKhoa = async (idNienKhoa) => {
+    try {
+      const res = await api.get("/api/classes/lop/", {
+        params: { IDNienKhoa: idNienKhoa },
+      });
+      setLopOptions(res.data);
+    } catch (error) {
+      console.error("Lỗi khi tải lớp:", error);
+    }
+  };
+
+  const handleXuatBaoCao = async () => {
+    if (!selectedLop || !selectedMon || !selectedHocKy) {
+      alert("Vui lòng chọn đầy đủ lớp, môn học và học kỳ.");
+      return;
+    }
+
     setLoading(true);
-    setMessage(null);
+    setThongBao("");
 
     try {
-      const response = await api.post(
-        "/grading/xuat-bao-cao-excel/",
+      const res = await api.post(
+        "/api/grading/baocao/",
         {
-          lop: selectedLop,
-          mon: selectedMonHoc,
-          hoc_ky: hocKy,
-          format,
+          IDLopHoc: selectedLop,
+          IDMonHoc: selectedMon,
+          IDHocKy: selectedHocKy,
         },
         {
-          responseType: "blob",
+          responseType: "blob", // Nhận file nhị phân
         }
       );
 
-      const blob = new Blob([response.data], {
-        type:
-          format === "pdf"
-            ? "application/pdf"
-            : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `bao-cao-${selectedLop}-${selectedMonHoc}.${format === "pdf" ? "pdf" : "xlsx"}`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "BaoCaoDiem.xlsx"); // Tên file tải về
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
 
-      setMessage({ type: "success", text: "Xuất báo cáo thành công!" });
+      setThongBao("✅ Báo cáo đã được tải về thành công.");
     } catch (error) {
-      console.error("Lỗi khi xuất báo cáo:", error);
-      setMessage({ type: "danger", text: "Xuất báo cáo thất bại." });
+      console.error("Lỗi xuất báo cáo:", error);
+      setThongBao("❌ Lỗi khi xuất báo cáo. Vui lòng kiểm tra dữ liệu.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Container className="mt-4">
-      <h4 className="fw-bold mb-3">Xuất báo cáo môn học</h4>
+    <Container className="py-4">
+      <Card className="p-4 shadow-sm border-0">
+        <h3 className="mb-4 text-center text-primary">📊 Xuất báo cáo điểm học kỳ</h3>
 
-      {message && <Alert variant={message.type}>{message.text}</Alert>}
-
-      <Form onSubmit={handleSubmit}>
         <Row className="mb-3">
-          <Col md={4}>
-            <Form.Group>
-              <Form.Label>Lớp học</Form.Label>
-              <Form.Select
-                value={selectedLop}
-                onChange={(e) => setSelectedLop(e.target.value)}
-                required
-              >
-                <option value="">-- Chọn lớp --</option>
-                {lopList.map((lop) => (
-                  <option key={lop.id} value={lop.id}>
-                    {lop.ten_lop}
-                  </option>
-                ))}
-              </Form.Select>
-            </Form.Group>
+          <Col md={3}>
+            <Form.Label>Niên khóa</Form.Label>
+            <Form.Select
+              value={selectedNienKhoa}
+              onChange={(e) => setSelectedNienKhoa(e.target.value)}
+            >
+              <option value="">-- Chọn niên khóa --</option>
+              {nienKhoaOptions.map((nk) => (
+                <option key={nk.id} value={nk.id}>
+                  {nk.TenNienKhoa}
+                </option>
+              ))}
+            </Form.Select>
           </Col>
-          <Col md={4}>
-            <Form.Group>
-              <Form.Label>Môn học</Form.Label>
-              <Form.Select
-                value={selectedMonHoc}
-                onChange={(e) => setSelectedMonHoc(e.target.value)}
-                required
-              >
-                <option value="">-- Chọn môn --</option>
-                {monHocList.map((mon) => (
-                  <option key={mon.id} value={mon.id}>
-                    {mon.ten_mon}
-                  </option>
-                ))}
-              </Form.Select>
-            </Form.Group>
+
+          <Col md={3}>
+            <Form.Label>Lớp học</Form.Label>
+            <Form.Select
+              value={selectedLop}
+              onChange={(e) => setSelectedLop(e.target.value)}
+              disabled={!selectedNienKhoa}
+            >
+              <option value="">-- Chọn lớp --</option>
+              {lopOptions.map((lop) => (
+                <option key={lop.id} value={lop.id}>
+                  {lop.TenLop}
+                </option>
+              ))}
+            </Form.Select>
           </Col>
-          <Col md={4}>
-            <Form.Group>
-              <Form.Label>Học kỳ</Form.Label>
-              <Form.Select
-                value={hocKy}
-                onChange={(e) => setHocKy(e.target.value)}
-              >
-                <option value="1">Học kỳ 1</option>
-                <option value="2">Học kỳ 2</option>
-              </Form.Select>
-            </Form.Group>
+
+          <Col md={3}>
+            <Form.Label>Môn học</Form.Label>
+            <Form.Select
+              value={selectedMon}
+              onChange={(e) => setSelectedMon(e.target.value)}
+            >
+              <option value="">-- Chọn môn học --</option>
+              {monOptions.map((mon) => (
+                <option key={mon.id} value={mon.id}>
+                  {mon.TenMonHoc}
+                </option>
+              ))}
+            </Form.Select>
+          </Col>
+
+          <Col md={3}>
+            <Form.Label>Học kỳ</Form.Label>
+            <Form.Select
+              value={selectedHocKy}
+              onChange={(e) => setSelectedHocKy(e.target.value)}
+            >
+              <option value="">-- Chọn học kỳ --</option>
+              {hocKyOptions.map((hk) => (
+                <option key={hk.id} value={hk.id}>
+                  {hk.TenHocKy}
+                </option>
+              ))}
+            </Form.Select>
           </Col>
         </Row>
 
-        <Row className="mb-3">
-          <Col md={4}>
-            <Form.Group>
-              <Form.Label>Định dạng báo cáo</Form.Label>
-              <Form.Select
-                value={format}
-                onChange={(e) => setFormat(e.target.value)}
-              >
-                <option value="excel">Excel</option>
-                <option value="pdf">PDF</option>
-              </Form.Select>
-            </Form.Group>
-          </Col>
-        </Row>
+        <div className="text-center mb-3">
+          <Button onClick={handleXuatBaoCao} disabled={loading}>
+            📥 Xuất báo cáo
+          </Button>
+        </div>
 
-        <Button type="submit" variant="primary" disabled={loading}>
-          {loading ? <Spinner size="sm" animation="border" /> : "Tạo báo cáo"}
-        </Button>
-      </Form>
+        {loading && (
+          <div className="text-center mb-2">
+            <Spinner animation="border" variant="primary" />
+          </div>
+        )}
+
+        {thongBao && <Alert variant="info">{thongBao}</Alert>}
+      </Card>
     </Container>
   );
 };

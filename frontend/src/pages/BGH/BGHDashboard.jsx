@@ -9,7 +9,7 @@ import {
   FaChalkboardTeacher,
   FaUserShield,
   FaUserTie,
-  FaFileExport,
+  FaClipboardList, // 🔄 dùng thay FaFileExport
 } from "react-icons/fa";
 import { useLayout } from "../../contexts/LayoutContext";
 import api from "../../api";
@@ -84,11 +84,11 @@ const BGHDashboard = () => {
       path: "/bgh/lophoc",
     },
     {
-      title: "Xuất báo cáo điểm",
-      description: "Tạo và tải báo cáo điểm toàn trường theo lớp, khối, học kỳ.",
-      icon: <FaFileExport />,
+      title: "Quản lý điểm", // 🔄 thay vì "Xuất báo cáo điểm"
+      description: "Xuất báo cáo điểm toàn trường theo lớp, khối, học kỳ.",
+      icon: <FaClipboardList />, // 🔄 thay FaFileExport
       color: "secondary",
-      path: "/bgh/xuat-bao-cao",
+      path: "/bgh/quan-ly-diem", // 🔄 trỏ tới trang mới
     },
   ];
 

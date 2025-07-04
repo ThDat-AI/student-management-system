@@ -30,27 +30,13 @@ const GiaoVienDashboard = () => {
   },
   { 
     title: "Quản lý điểm", 
-    description: "Nhập, chỉnh sửa và xem điểm của học sinh.", 
+    description: "Truy cập các chức năng nhập điểm, tổng hợp và xuất báo cáo.", 
     icon: <FaClipboardList />, 
     color: "warning", 
-    path: "/giaovien/quan-ly-diem" 
+    path: "/giaovien/quan-ly-diem" // sẽ dẫn đến trang có 3 nút con
   },
-  { 
-    title: "Tổng hợp điểm học kỳ", 
-    description: "Tính điểm trung bình và phân loại học lực học sinh.", 
-    icon: <FaClipboardList />, 
-    color: "info", 
-    path: "/giaovien/tong-hop-diem" 
-  },
-  {
-  title: "Xuất báo cáo",
-  description: "Xuất bảng điểm môn học theo lớp và học kỳ.",
-  icon: <FaFileExport />,
-  color: "danger",
-  path: "/giaovien/xuat-bao-cao"
-  },
-
 ];
+
 
   return (
     <div className="dashboard-container">

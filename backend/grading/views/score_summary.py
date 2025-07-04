@@ -3,65 +3,79 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 
-from grading.models import DiemSo, TongKetHocKy, HocKy
 from students.models import HocSinh
+from grading.models import DiemSo
 from classes.models import LopHoc
-
+from classes.models import LopHoc_HocSinh
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def tong_hop_diem_hoc_ky(request):
-    id_lop = request.data.get('IDLopHoc')
-    id_hocky = request.data.get('IDHocKy')
+    id_lop = request.data.get("IDLopHoc")
+    id_mon = request.data.get("IDMonHoc")
+    id_hocky = request.data.get("IDHocKy")
 
-    if not id_lop or not id_hocky:
-        return Response({'error': 'Thiếu IDLopHoc hoặc IDHocKy'}, status=400)
-
-    try:
-        hoc_ky = HocKy.objects.get(id=id_hocky)
-    except HocKy.DoesNotExist:
-        return Response({'error': 'Học kỳ không tồn tại'}, status=404)
-
-    hoc_sinh_list = HocSinh.objects.filter(IDLopHoc=id_lop)
-    ket_qua = []
-
-    for hs in hoc_sinh_list:
-        diem_mon = DiemSo.objects.filter(IDHocSinh=hs, IDHocKy=hoc_ky)
-
-        diem_tb_list = [d.DiemTB for d in diem_mon if d.DiemTB is not None]
-
-        if len(diem_tb_list) < 2:
-            ket_qua.append({
-                'HocSinh': str(hs),
-                'CanhBao': 'Thiếu điểm môn học'
-            })
-            continue
-
-        diem_tb_hk = round(sum(diem_tb_list) / len(diem_tb_list), 2)
-
-        if diem_tb_hk >= 8.0:
-            hoc_luc = 'Giỏi'
-        elif diem_tb_hk >= 6.5:
-            hoc_luc = 'Khá'
-        elif diem_tb_hk >= 5.0:
-            hoc_luc = 'Trung bình'
-        else:
-            hoc_luc = 'Yếu'
-
-        TongKetHocKy.objects.update_or_create(
-            IDHocSinh=hs,
-            IDLopHoc_id=id_lop,
-            IDHocKy=hoc_ky,
-            defaults={
-                'DiemTBHocKy': diem_tb_hk,
-                'HocLuc': hoc_luc
-            }
+    if not all([id_lop, id_mon, id_hocky]):
+        return Response(
+            {"error": "Thiếu tham số: IDLopHoc, IDMonHoc, IDHocKy là bắt buộc."},
+            status=status.HTTP_400_BAD_REQUEST
         )
 
-        ket_qua.append({
-            'HocSinh': str(hs),
-            'DiemTBHocKy': diem_tb_hk,
-            'HocLuc': hoc_luc
+    try:
+        lop = LopHoc.objects.get(id=id_lop)
+    except LopHoc.DoesNotExist:
+        return Response({"error": "Lớp không tồn tại."}, status=status.HTTP_404_NOT_FOUND)
+
+    hoc_sinh_ids = LopHoc_HocSinh.objects.filter(IDLopHoc=lop).values_list('IDHocSinh', flat=True)
+    hoc_sinh_list = HocSinh.objects.filter(id__in=hoc_sinh_ids)
+
+
+    results = []
+
+    for hs in hoc_sinh_list:
+        try:
+            diem = DiemSo.objects.get(
+                IDHocSinh=hs,
+                IDLopHoc_id=id_lop,
+                IDMonHoc_id=id_mon,
+                IDHocKy_id=id_hocky
+            )
+        except DiemSo.DoesNotExist:
+            continue  # Không có điểm thì bỏ qua
+
+        # Kiểm tra có đủ điểm để tính không
+        if any([
+            diem.DiemMieng is None,
+            diem.Diem15 is None,
+            diem.Diem1Tiet is None,
+            diem.DiemThi is None
+        ]):
+            continue
+
+        # Tính điểm trung bình học kỳ theo đúng serializer
+        diem_tb = (
+            diem.DiemMieng +
+            diem.Diem15 +
+            2 * diem.Diem1Tiet +
+            3 * diem.DiemThi
+        ) / 7
+        diem_tb = round(diem_tb, 2)
+
+        # Phân loại học lực
+        if diem_tb >= 8:
+            xeploai = "Giỏi"
+        elif diem_tb >= 6.5:
+            xeploai = "Khá"
+        elif diem_tb >= 5:
+            xeploai = "Trung bình"
+        else:
+            xeploai = "Yếu"
+
+        results.append({
+            "id": hs.id,
+            "HoTen": hs.HoTen,
+            "DiemTBHocKy": diem_tb,
+            "XepLoai": xeploai
         })
 
-    return Response(ket_qua)
+    return Response(results, status=status.HTTP_200_OK)

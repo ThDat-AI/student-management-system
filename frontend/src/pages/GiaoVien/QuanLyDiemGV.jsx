@@ -10,8 +10,10 @@ import {
   Spinner,
   Card,
 } from "react-bootstrap";
+import { FaChalkboardTeacher } from "react-icons/fa";
 import api from "../../api";
 import { useLayout } from "../../contexts/LayoutContext";
+import "../../assets/styles/GiaoVienDashboard.css";
 
 const QuanLyDiemGV = () => {
   const { setPageTitle } = useLayout();
@@ -154,135 +156,82 @@ const QuanLyDiemGV = () => {
   };
 
   return (
-    <Container className="py-4">
-      <Card className="p-4 shadow-sm border-0">
-        <h3 className="mb-4 text-primary text-center">Nhập và cập nhật điểm học sinh</h3>
-
-        <Row className="mb-4">
-          <Col md={3}>
-            <Form.Label>Niên khóa</Form.Label>
-            <Form.Select value={selectedNienKhoa} onChange={(e) => setSelectedNienKhoa(e.target.value)}>
-              <option value="">-- Chọn niên khóa --</option>
-              {nienKhoaOptions.map((nk) => (
-                <option key={nk.id} value={nk.id}>{nk.TenNienKhoa}</option>
-              ))}
-            </Form.Select>
-          </Col>
-          <Col md={3}>
-            <Form.Label>Lớp</Form.Label>
-            <Form.Select value={selectedLop} onChange={(e) => setSelectedLop(e.target.value)}>
-              <option value="">-- Chọn lớp --</option>
-              {lopOptions.map((lop) => (
-                <option key={lop.id} value={lop.id}>{lop.TenLop}</option>
-              ))}
-            </Form.Select>
-          </Col>
-          <Col md={3}>
-            <Form.Label>Môn học</Form.Label>
-            <Form.Select value={selectedMon} onChange={(e) => setSelectedMon(e.target.value)}>
-              <option value="">-- Chọn môn --</option>
-              {monOptions.map((mon) => (
-                <option key={mon.id} value={mon.id}>{mon.TenMonHoc}</option>
-              ))}
-            </Form.Select>
-          </Col>
-          <Col md={3}>
-            <Form.Label>Học kỳ</Form.Label>
-            <Form.Select value={selectedHocKy} onChange={(e) => setSelectedHocKy(e.target.value)}>
-              <option value="">-- Chọn học kỳ --</option>
-              {hocKyOptions.map((hk) => (
-                <option key={hk.id} value={hk.id}>{hk.TenHocKy}</option>
-              ))}
-            </Form.Select>
-          </Col>
-        </Row>
-
-        <div className="text-center mb-4">
-          <Button onClick={fetchDanhSachHocSinh} className="px-4">📋 Tải danh sách học sinh</Button>
+    <div className="dashboard-container">
+      <Container fluid className="px-4 py-4">
+        <div className="welcome-banner p-4 rounded-4 position-relative overflow-hidden mb-4">
+          <div className="banner-bg-animation">
+            <div className="floating-orb orb-1"></div>
+            <div className="floating-orb orb-2"></div>
+            <div className="floating-orb orb-3"></div>
+          </div>
+          <div className="welcome-content d-flex align-items-center">
+            <div className="banner-avatar-section me-4">
+              <div className="avatar-container">
+                <div className="avatar-main">
+                  <div className="avatar-placeholder">
+                    <FaChalkboardTeacher size={32} className="text-white avatar-icon" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <h2 className="text-white mb-1 fw-bold banner-title">Quản lý điểm học sinh</h2>
+              <p className="text-white-75 mb-0 banner-subtitle">Nhập và cập nhật điểm nhanh chóng, trực quan</p>
+            </div>
+          </div>
         </div>
 
-        {loading ? (
-          <div className="text-center">
-            <Spinner animation="border" />
-          </div>
-        ) : (
-          <Table striped bordered hover responsive className="align-middle">
-            <thead className="table-primary text-center">
-              <tr>
-                <th>#</th>
-                <th>Họ tên</th>
-                <th>Miệng</th>
-                <th>15 phút</th>
-                <th>1 tiết</th>
-                <th>Học kỳ</th>
-                <th>Lưu</th>
-              </tr>
-            </thead>
-            <tbody>
-              {danhSach.map((hs, idx) => (
-                <tr key={hs.id}>
-                  <td className="text-center">{idx + 1}</td>
-                  <td>{hs.HoTen}</td>
-                  <td>
-                    <Form.Control
-                      type="number"
-                      name={`diem_mieng_${hs.id}`}
-                      id={`diem_mieng_${hs.id}`}
-                      value={hs.DiemMieng}
-                      onChange={(e) => handleChange(idx, "DiemMieng", e.target.value)}
-                    />
-                  </td>
-                  <td>
-                    <Form.Control
-                      type="number"
-                      name={`diem_15phut_${hs.id}`}
-                      id={`diem_15phut_${hs.id}`}
-                      value={hs.Diem15Phut}
-                      onChange={(e) => handleChange(idx, "Diem15Phut", e.target.value)}
-                    />
-                  </td>
-                  <td>
-                    <Form.Control
-                      type="number"
-                      name={`diem_1tiet_${hs.id}`}
-                      id={`diem_1tiet_${hs.id}`}
-                      value={hs.Diem1Tiet}
-                      onChange={(e) => handleChange(idx, "Diem1Tiet", e.target.value)}
-                    />
-                  </td>
-                  <td>
-                    <Form.Control
-                      type="number"
-                      name={`diem_hocky_${hs.id}`}
-                      id={`diem_hocky_${hs.id}`}
-                      value={hs.DiemHocKy}
-                      onChange={(e) => handleChange(idx, "DiemHocKy", e.target.value)}
-                    />
-                  </td>
-                  <td className="text-center">
-                    <Button
-                      size="sm"
-                      variant="success"
-                      onClick={() => handleLuu(hs)}
-                      disabled={
-                        hs.DiemMieng === "" ||
-                        hs.Diem15Phut === "" ||
-                        hs.Diem1Tiet === "" ||
-                        hs.DiemHocKy === ""
-                      }
-                    >
-                      💾 Lưu
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
-        )}
+        <Card className="p-4 shadow-sm border-0">
+          <Row className="mb-4">
+            <Col md={3}><Form.Label>Niên khóa</Form.Label><Form.Select value={selectedNienKhoa} onChange={(e) => setSelectedNienKhoa(e.target.value)}><option value="">-- Chọn niên khóa --</option>{nienKhoaOptions.map((nk) => (<option key={nk.id} value={nk.id}>{nk.TenNienKhoa}</option>))}</Form.Select></Col>
+            <Col md={3}><Form.Label>Lớp</Form.Label><Form.Select value={selectedLop} onChange={(e) => setSelectedLop(e.target.value)}><option value="">-- Chọn lớp --</option>{lopOptions.map((lop) => (<option key={lop.id} value={lop.id}>{lop.TenLop}</option>))}</Form.Select></Col>
+            <Col md={3}><Form.Label>Môn học</Form.Label><Form.Select value={selectedMon} onChange={(e) => setSelectedMon(e.target.value)}><option value="">-- Chọn môn --</option>{monOptions.map((mon) => (<option key={mon.id} value={mon.id}>{mon.TenMonHoc}</option>))}</Form.Select></Col>
+            <Col md={3}><Form.Label>Học kỳ</Form.Label><Form.Select value={selectedHocKy} onChange={(e) => setSelectedHocKy(e.target.value)}><option value="">-- Chọn học kỳ --</option>{hocKyOptions.map((hk) => (<option key={hk.id} value={hk.id}>{hk.TenHocKy}</option>))}</Form.Select></Col>
+          </Row>
 
-        {thongBao && <Alert variant="info" className="mt-3">{thongBao}</Alert>}
-      </Card>
-    </Container>
+          <div className="text-center mb-4">
+            <Button onClick={fetchDanhSachHocSinh} className="px-4">📋 Tải danh sách học sinh</Button>
+          </div>
+
+          {loading ? (
+            <div className="text-center">
+              <Spinner animation="border" />
+            </div>
+          ) : (
+            <Table striped bordered hover responsive className="align-middle">
+              <thead className="table-primary text-center">
+                <tr>
+                  <th>#</th>
+                  <th>Họ tên</th>
+                  <th>Miệng</th>
+                  <th>15 phút</th>
+                  <th>1 tiết</th>
+                  <th>Học kỳ</th>
+                  <th>Lưu</th>
+                </tr>
+              </thead>
+              <tbody>
+                {danhSach.map((hs, idx) => (
+                  <tr key={hs.id}>
+                    <td className="text-center">{idx + 1}</td>
+                    <td>{hs.HoTen}</td>
+                    <td><Form.Control type="number" value={hs.DiemMieng} onChange={(e) => handleChange(idx, "DiemMieng", e.target.value)} /></td>
+                    <td><Form.Control type="number" value={hs.Diem15Phut} onChange={(e) => handleChange(idx, "Diem15Phut", e.target.value)} /></td>
+                    <td><Form.Control type="number" value={hs.Diem1Tiet} onChange={(e) => handleChange(idx, "Diem1Tiet", e.target.value)} /></td>
+                    <td><Form.Control type="number" value={hs.DiemHocKy} onChange={(e) => handleChange(idx, "DiemHocKy", e.target.value)} /></td>
+                    <td className="text-center">
+                      <Button size="sm" variant="success" onClick={() => handleLuu(hs)} disabled={hs.DiemMieng === "" || hs.Diem15Phut === "" || hs.Diem1Tiet === "" || hs.DiemHocKy === ""}>💾 Lưu</Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          )}
+
+          {thongBao && <Alert variant="info" className="mt-3">{thongBao}</Alert>}
+        </Card>
+      </Container>
+    </div>
   );
 };
 

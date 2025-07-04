@@ -2,6 +2,8 @@ from django.db import models
 from django.core.exceptions import ValidationError
 from datetime import date
 from django.contrib.auth import get_user_model
+from classes.models import LopHoc
+from configurations.models import NienKhoa
 
 User = get_user_model()
 
@@ -28,58 +30,25 @@ class HocSinh(models.Model):
 
     Ho = models.CharField(max_length=50, verbose_name="Họ")
     Ten = models.CharField(max_length=50, verbose_name="Tên")
-    GioiTinh = models.CharField(
-        max_length=10, 
-        choices=GIOI_TINH_CHOICES, 
-        verbose_name="Giới tính"
-    )
-    NgaySinh = models.DateField(
-        verbose_name="Ngày sinh",
-        validators=[validate_student_age]
-    )
+    GioiTinh = models.CharField(max_length=10, choices=GIOI_TINH_CHOICES, verbose_name="Giới tính")
+    NgaySinh = models.DateField(verbose_name="Ngày sinh", validators=[validate_student_age])
     DiaChi = models.CharField(max_length=255, verbose_name="Địa chỉ")
-    Email = models.EmailField(
-        unique=True, 
-        null=True, 
-        blank=True,
-        verbose_name="Email"
-    )
-    IDNienKhoaTiepNhan = models.ForeignKey(
-        'configurations.NienKhoa', 
-        on_delete=models.PROTECT,
-        verbose_name="Niên khóa tiếp nhận"
-    )
-    TrangThai = models.CharField(
-        max_length=20,
-        choices=TRANG_THAI_CHOICES,
-        default='dang_hoc',
-        verbose_name="Trạng thái"
-    )
+    Email = models.EmailField(unique=True, null=True, blank=True, verbose_name="Email")
+    IDNienKhoaTiepNhan = models.ForeignKey(NienKhoa, on_delete=models.PROTECT, verbose_name="Niên khóa tiếp nhận")
+    TrangThai = models.CharField(max_length=20, choices=TRANG_THAI_CHOICES, default='dang_hoc', verbose_name="Trạng thái")
+
+    # ➕ Thêm liên kết lớp học
+    LopHoc = models.ForeignKey(LopHoc, on_delete=models.SET_NULL, null=True, blank=True, related_name='hoc_sinh', verbose_name="Lớp học")
+
     NgayTao = models.DateTimeField(auto_now_add=True, verbose_name="Ngày tạo")
     NgayCapNhat = models.DateTimeField(auto_now=True, verbose_name="Ngày cập nhật")
-    NguoiTao = models.ForeignKey(
-        User,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='hoc_sinh_tao',
-        verbose_name="Người tạo"
-    )
-    NguoiCapNhat = models.ForeignKey(
-        User,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='hoc_sinh_cap_nhat',
-        verbose_name="Người cập nhật"
-    )
+    NguoiTao = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='hoc_sinh_tao', verbose_name="Người tạo")
+    NguoiCapNhat = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='hoc_sinh_cap_nhat', verbose_name="Người cập nhật")
 
     def clean(self):
-        # Kiểm tra tuổi học sinh so với niên khóa
         if self.IDNienKhoaTiepNhan:
             nam_nien_khoa = int(self.IDNienKhoaTiepNhan.TenNienKhoa.split('-')[0])
             tuoi_nam_nhap_hoc = nam_nien_khoa - self.NgaySinh.year
-            
             if tuoi_nam_nhap_hoc < 15 or tuoi_nam_nhap_hoc > 20:
                 raise ValidationError(
                     f"Tuổi học sinh khi nhập học phải từ 15 đến 20. "
@@ -88,7 +57,7 @@ class HocSinh(models.Model):
                 )
 
     def save(self, *args, **kwargs):
-        self.clean()  # Thực hiện validation trước khi lưu
+        self.clean()
         super().save(*args, **kwargs)
 
     @property
@@ -98,14 +67,12 @@ class HocSinh(models.Model):
     @property
     def Tuoi(self):
         today = date.today()
-        return today.year - self.NgaySinh.year - (
-            (today.month, today.day) < (self.NgaySinh.month, self.NgaySinh.day)
-        )
+        return today.year - self.NgaySinh.year - ((today.month, today.day) < (self.NgaySinh.month, self.NgaySinh.day))
 
-    def __str__(self): 
+    def __str__(self):
         return f"{self.Ho} {self.Ten} - {self.IDNienKhoaTiepNhan.TenNienKhoa}"
 
-    class Meta: 
+    class Meta:
         db_table = 'HOCSINH'
         verbose_name = 'Học sinh'
         verbose_name_plural = 'Quản lý học sinh'
