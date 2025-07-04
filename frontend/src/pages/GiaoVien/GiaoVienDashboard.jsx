@@ -14,28 +14,43 @@ const GiaoVienDashboard = () => {
   }, [setPageTitle]);
 
   const menuItems = [
-    { 
-      title: "Tra cứu học sinh", 
-      description: "Tìm kiếm thông tin chi tiết của học sinh trong hệ thống.", 
-      icon: <FaSearch />, 
-      color: "primary", 
-      path: "/teacher/tra-cuu-hoc-sinh" 
-    },
-    { 
-      title: "Xuất danh sách lớp", 
-      description: "Tạo và xuất danh sách học sinh của các lớp chủ nhiệm.", 
-      icon: <FaFileExport />, 
-      color: "success", 
-      path: "/teacher/xuat-danh-sach-lop" 
-    },
-    { 
-      title: "Quản lý điểm", 
-      description: "Nhập, chỉnh sửa và xem điểm của học sinh.", 
-      icon: <FaClipboardList />, 
-      color: "warning", 
-      path: "/teacher/quan-ly-diem" 
-    },
-  ];
+  { 
+    title: "Tra cứu học sinh", 
+    description: "Tìm kiếm thông tin chi tiết của học sinh trong hệ thống.", 
+    icon: <FaSearch />, 
+    color: "primary", 
+    path: "/giaovien/tra-cuu-hoc-sinh" 
+  },
+  { 
+    title: "Xuất danh sách lớp", 
+    description: "Tạo và xuất danh sách học sinh của các lớp chủ nhiệm.", 
+    icon: <FaFileExport />, 
+    color: "success", 
+    path: "/giaovien/xuat-danh-sach-lop" 
+  },
+  { 
+    title: "Quản lý điểm", 
+    description: "Nhập, chỉnh sửa và xem điểm của học sinh.", 
+    icon: <FaClipboardList />, 
+    color: "warning", 
+    path: "/giaovien/quan-ly-diem" 
+  },
+  { 
+    title: "Tổng hợp điểm học kỳ", 
+    description: "Tính điểm trung bình và phân loại học lực học sinh.", 
+    icon: <FaClipboardList />, 
+    color: "info", 
+    path: "/giaovien/tong-hop-diem" 
+  },
+  {
+  title: "Xuất báo cáo",
+  description: "Xuất bảng điểm môn học theo lớp và học kỳ.",
+  icon: <FaFileExport />,
+  color: "danger",
+  path: "/giaovien/xuat-bao-cao"
+  },
+
+];
 
   return (
     <div className="dashboard-container">

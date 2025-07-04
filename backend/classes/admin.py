@@ -1,8 +1,6 @@
 from django.contrib import admin
-
-# Register your models here.
-   
-   
-from .models import Khoi
+from .models import Khoi, LopHoc, LopHoc_HocSinh
 
 admin.site.register(Khoi)
+admin.site.register(LopHoc)
+admin.site.register(LopHoc_HocSinh)
