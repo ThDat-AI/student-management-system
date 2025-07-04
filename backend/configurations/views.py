@@ -1,6 +1,6 @@
 # configurations/views.py
 
-from rest_framework import generics, views, status, filters
+from rest_framework import generics, views, status, filters, permissions
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
@@ -9,6 +9,13 @@ from .models import NienKhoa, ThamSo
 from .serializers import ThamSoSerializer, CreateQuyDinhVaNienKhoaSerializer
 from students.models import HocSinh
 from classes.models import LopHoc
+from .models import NienKhoa
+from .serializers import NienKhoaSerializer
+
+class NienKhoaDropdownView(generics.ListAPIView):
+    queryset = NienKhoa.objects.all()
+    serializer_class = NienKhoaSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
 class ListCreateQuyDinhView(generics.ListCreateAPIView):
     # Sắp xếp mặc định theo TenNienKhoa giảm dần

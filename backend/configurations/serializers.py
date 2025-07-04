@@ -8,7 +8,7 @@ import re
 class NienKhoaSerializer(serializers.ModelSerializer):
     class Meta:
         model = NienKhoa
-        fields = ['id', 'TenNienKhoa']
+        fields = '__all__'
 
 class ThamSoSerializer(serializers.ModelSerializer):
     TenNienKhoa = serializers.CharField(source='IDNienKhoa.TenNienKhoa', read_only=True)

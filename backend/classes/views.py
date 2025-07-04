@@ -17,9 +17,15 @@ from .serializers import (
 )
 
 class LopHocListView(generics.ListAPIView):
-    queryset = LopHoc.objects.all()
     serializer_class = LopHocSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = LopHoc.objects.all().select_related('IDKhoi', 'IDNienKhoa', 'IDToHop')
+        id_nien_khoa = self.request.query_params.get('IDNienKhoa')
+        if id_nien_khoa:
+            queryset = queryset.filter(IDNienKhoa_id=id_nien_khoa)
+        return queryset
 
 # ---------------------------
 # UC06-01 & UC06-04: Thêm và hiển thị danh sách lớp

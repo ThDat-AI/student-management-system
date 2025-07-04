@@ -23,7 +23,7 @@ urlpatterns = [
     path("api/classes/", include("classes.urls")),             # Lớp học
     path("api/students/", include("students.urls")),           # Học sinh
     path("api/grading/", include("grading.urls")),             # Quản lý điểm
-
+    
     # Trang root test
     path("", home),  # GET http://localhost:8000 → sẽ thấy dòng Welcome
 ]
