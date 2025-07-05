@@ -25,12 +25,10 @@ import AccountManagement from "./pages/BGH/AccountManagement/AccountManagement";
 import QuyDinhManagement from "./pages/BGH/QuyDinhManagement";
 import LopHocManagement from "./pages/GiaoVu/LopHocManagement"; // dùng chung với giáo vụ
 import TongHopDiemBGH from "./pages/BGH/TongHopDiemBGH";
-import QuanLyDiemBGHWrapper from "./pages/BGH/QuanLyDiemBGHWrapper"; // ✅ wrapper quản lý điểm cho BGH
 
 // ======================= Giáo vụ Pages =======================
 import GiaoVuDashboard from "./pages/GiaoVu/GiaoVuDashboard";
 import LapDanhSachLop from "./pages/GiaoVu/LapDanhSachLop";
-import QuanLyDiemGVuWrapper from "./pages/GiaoVu/QuanLyDiemGVuWrapper";
 import TongHopDiemGVu from "./pages/GiaoVu/TongHopDiemGVu";
 
 // ======================= Giáo viên Pages =======================
@@ -68,8 +66,7 @@ function App() {
                   <Route path="bgh/taikhoan" element={<AccountManagement />} />
                   <Route path="bgh/quydinh" element={<QuyDinhManagement />} />
                   <Route path="bgh/lophoc" element={<LopHocManagement />} />
-                  <Route path="bgh/quan-ly-diem" element={<QuanLyDiemBGHWrapper />} /> {/* ✅ gộp quản lý điểm */}
-                  <Route path="bgh/xuat-bao-cao" element={<TongHopDiemBGH />} /> {/* dùng trong wrapper */}
+                  <Route path="bgh/xuat-bao-cao" element={<TongHopDiemBGH />} />
                 </Route>
 
                 {/* =================== Giáo vụ Routes =================== */}
@@ -77,8 +74,8 @@ function App() {
                   <Route path="giaovu" element={<GiaoVuDashboard />} />
                   <Route path="giaovu/quan-ly-lop-hoc" element={<LopHocManagement />} />
                   <Route path="giaovu/lap-danh-sach-lop" element={<LapDanhSachLop />} />
-                  <Route path="giaovu/quan-ly-diem" element={<QuanLyDiemGVuWrapper />} />
-                  <Route path="giaovu/quan-ly-diem/tong-hop" element={<TongHopDiemGVu />} />
+                  <Route path="/giaovu/quan-ly-diem/tong-hop" element={<TongHopDiemGVu />} />
+
                 </Route>
 
                 {/* =================== Giáo viên Routes =================== */}

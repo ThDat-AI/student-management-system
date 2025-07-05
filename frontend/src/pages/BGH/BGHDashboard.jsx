@@ -67,7 +67,7 @@ const BGHDashboard = () => {
       description: "Xem các báo cáo tổng quan về học tập và hệ thống.",
       icon: <FaChartBar />,
       color: "success",
-      path: "/bgh/quan-ly-diem",
+      path: "/bgh/xuat-bao-cao",
 
     },
     {

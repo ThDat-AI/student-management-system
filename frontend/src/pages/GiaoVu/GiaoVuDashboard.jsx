@@ -40,14 +40,7 @@ const GiaoVuDashboard = () => {
       description: "Tạo báo cáo về học sinh, lớp học và hiệu quả giảng dạy.", 
       icon: <FaChartBar />, 
       color: "info", 
-      path: "/giaovu/bao-cao-thong-ke" 
-    },
-    {
-      title: "Quản lý điểm",
-      description: "Tổng hợp và xuất báo cáo điểm học sinh.",
-      icon: <FaClipboardList />,
-      color: "danger",
-      path: "/giaovu/quan-ly-diem"
+      path: "/giaovu/quan-ly-diem/tong-hop" 
     }
   ];
 
