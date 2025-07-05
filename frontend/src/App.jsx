@@ -32,7 +32,6 @@ import GiaoVuDashboard from "./pages/GiaoVu/GiaoVuDashboard";
 import LapDanhSachLop from "./pages/GiaoVu/LapDanhSachLop";
 import QuanLyDiemGVuWrapper from "./pages/GiaoVu/QuanLyDiemGVuWrapper";
 import TongHopDiemGVu from "./pages/GiaoVu/TongHopDiemGVu";
-import XuatBaoCaoGVu from "./pages/GiaoVu/XuatBaoCaoGVu";
 
 // ======================= Giáo viên Pages =======================
 import GiaoVienDashboard from "./pages/GiaoVien/GiaoVienDashboard";
@@ -80,7 +79,6 @@ function App() {
                   <Route path="giaovu/lap-danh-sach-lop" element={<LapDanhSachLop />} />
                   <Route path="giaovu/quan-ly-diem" element={<QuanLyDiemGVuWrapper />} />
                   <Route path="giaovu/quan-ly-diem/tong-hop" element={<TongHopDiemGVu />} />
-                  <Route path="giaovu/quan-ly-diem/xuat-bao-cao" element={<XuatBaoCaoGVu />} />
                 </Route>
 
                 {/* =================== Giáo viên Routes =================== */}

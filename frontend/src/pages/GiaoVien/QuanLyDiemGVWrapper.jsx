@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Container, Row, Col, Card, Button } from "react-bootstrap";
 import { FaPen, FaChartBar, FaFileExport, FaClipboardList } from "react-icons/fa";
 import { useLayout } from "../../contexts/LayoutContext";
-import '../../assets/styles/BGHDashboard.css';
+import '../../assets/styles/GiaoVienDashboard.css';
 
 const QuanLyDiemGVWrapper = () => {
   const navigate = useNavigate();

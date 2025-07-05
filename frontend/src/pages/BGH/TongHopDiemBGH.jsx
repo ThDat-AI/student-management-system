@@ -12,7 +12,7 @@ import {
 } from "react-bootstrap";
 import { FaClipboardList } from "react-icons/fa";
 import api from "../../api";
-import "../../assets/styles/GiaoVienDashboard.css"; // dùng lại hiệu ứng nền
+import "../../assets/styles/BGHDashboard.css";
 
 const TongHopDiemBGH = () => {
   const [nienKhoaList, setNienKhoaList] = useState([]);

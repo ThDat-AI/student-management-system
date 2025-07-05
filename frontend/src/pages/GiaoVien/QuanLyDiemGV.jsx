@@ -12,7 +12,7 @@ import {
 } from "react-bootstrap";
 import { FaClipboardList } from "react-icons/fa";
 import api from "../../api";
-import "../../assets/styles/BGHDashboard.css"; // reuse banner CSS
+import "../../assets/styles/GiaoVienDashboard.css"; // reuse banner CSS
 
 const QuanLyDiemGV = () => {
   const [lopList, setLopList] = useState([]);

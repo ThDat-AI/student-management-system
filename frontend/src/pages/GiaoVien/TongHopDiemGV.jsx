@@ -12,7 +12,7 @@ import {
 } from "react-bootstrap";
 import { FaClipboardList } from "react-icons/fa";
 import api from "../../api";
-import "../../assets/styles/BGHDashboard.css"; // dùng lại hiệu ứng sóng
+import "../../assets/styles/GiaoVienDashboard.css";
 
 const TongHopDiemGV = () => {
   const [nienKhoaList, setNienKhoaList] = useState([]);

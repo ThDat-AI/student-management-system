@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Container, Row, Col, Card, Button } from "react-bootstrap";
 import { FaChartBar, FaFileExport, FaClipboardList } from "react-icons/fa";
 import { useLayout } from "../../contexts/LayoutContext";
-import '../../assets/styles/GiaoVienDashboard.css'; // dùng lại style dashboard
+import '../../assets/styles/GiaoVuDashboard.css'; // dùng lại style dashboard
 
 const QuanLyDiemGVuWrapper = () => {
   const navigate = useNavigate();

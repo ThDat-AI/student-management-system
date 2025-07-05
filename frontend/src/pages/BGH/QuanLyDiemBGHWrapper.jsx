@@ -10,7 +10,7 @@ const QuanLyDiemBGHWrapper = () => {
   const { setPageTitle } = useLayout();
 
   useEffect(() => {
-    setPageTitle("Quản lý điểm - Ban Giám Hiệu");
+    setPageTitle("Xuất báo cáo - Ban Giám Hiệu");
   }, [setPageTitle]);
 
   const menuItems = [
@@ -61,7 +61,7 @@ const QuanLyDiemBGHWrapper = () => {
               </div>
             </div>
             <div>
-              <h2 className="text-white mb-1 fw-bold banner-title">Quản lý điểm toàn trường</h2>
+              <h2 className="text-white mb-1 fw-bold banner-title">Xuất các báo cáo & thống kê</h2>
               <p className="text-white-75 mb-0 banner-subtitle">Chọn chức năng để tiếp tục</p>
             </div>
           </div>
