@@ -6,232 +6,275 @@ import {
   Form,
   Button,
   Table,
-  Alert,
   Spinner,
+  Alert,
   Card,
 } from "react-bootstrap";
-import { FaChalkboardTeacher } from "react-icons/fa";
+import { FaClipboardList } from "react-icons/fa";
 import api from "../../api";
-import { useLayout } from "../../contexts/LayoutContext";
-import "../../assets/styles/GiaoVienDashboard.css";
+import "../../assets/styles/BGHDashboard.css"; // reuse banner CSS
 
 const QuanLyDiemGV = () => {
-  const { setPageTitle } = useLayout();
-  const [nienKhoaOptions, setNienKhoaOptions] = useState([]);
-  const [lopOptions, setLopOptions] = useState([]);
-  const [monOptions, setMonOptions] = useState([]);
-  const [hocKyOptions, setHocKyOptions] = useState([]);
+  const [lopList, setLopList] = useState([]);
+  const [monHocList, setMonHocList] = useState([]);
+  const [hocKyList, setHocKyList] = useState([]);
+  const [nienKhoaList, setNienKhoaList] = useState([]);
+
+  const [hocSinhList, setHocSinhList] = useState([]);
+  const [diemData, setDiemData] = useState({});
 
   const [selectedNienKhoa, setSelectedNienKhoa] = useState("");
   const [selectedLop, setSelectedLop] = useState("");
-  const [selectedMon, setSelectedMon] = useState("");
+  const [selectedMonHoc, setSelectedMonHoc] = useState("");
   const [selectedHocKy, setSelectedHocKy] = useState("");
 
-  const [danhSach, setDanhSach] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [thongBao, setThongBao] = useState("");
+  const [message, setMessage] = useState(null);
+
+  const daChonDayDu = selectedNienKhoa && selectedLop && selectedMonHoc && selectedHocKy;
 
   useEffect(() => {
-    setPageTitle("Nhập & Cập nhật điểm");
-    fetchDropdowns();
+    api.get("/api/configurations/nienkhoa/").then((res) => setNienKhoaList(res.data));
+    api.get("/api/classes/lop/").then((res) => setLopList(res.data));
+    api.get("/api/subjects/monhoc/").then((res) => setMonHocList(res.data));
+    api.get("/api/grading/hocky/").then((res) => setHocKyList(res.data));
   }, []);
 
-  useEffect(() => {
-    if (selectedNienKhoa) {
-      fetchLopTheoNienKhoa(selectedNienKhoa);
-    } else {
-      setLopOptions([]);
-      setSelectedLop("");
-    }
-  }, [selectedNienKhoa]);
+  const handleXuatDanhSach = async () => {
+    if (!daChonDayDu) return;
 
-  const fetchDropdowns = async () => {
-    try {
-      const [nkRes, monRes, hkRes] = await Promise.all([
-        api.get("/api/configurations/nienkhoa/"),
-        api.get("/api/subjects/monhoc/"),
-        api.get("/api/grading/hocky/")
-      ]);
-      setNienKhoaOptions(nkRes.data);
-      setMonOptions(monRes.data);
-      setHocKyOptions(hkRes.data);
-    } catch (error) {
-      console.error("Lỗi tải dropdown:", error);
-    }
-  };
-
-  const fetchLopTheoNienKhoa = async (idNienKhoa) => {
-    try {
-      const res = await api.get("/api/classes/lop/", {
-        params: { IDNienKhoa: idNienKhoa }
-      });
-      setLopOptions(res.data);
-    } catch (error) {
-      console.error("Lỗi khi tải lớp theo niên khóa:", error);
-    }
-  };
-
-  const fetchDanhSachHocSinh = async () => {
-    if (!selectedLop || !selectedMon || !selectedHocKy) {
-      alert("Vui lòng chọn đầy đủ lớp, môn và học kỳ.");
-      return;
-    }
-
+    setMessage(null);
+    setHocSinhList([]);
+    setDiemData({});
     setLoading(true);
+
     try {
-      const res = await api.get("/api/students/danhsach/", {
-        params: { IDLopHoc: selectedLop },
+      const hsRes = await api.get(`/api/students/danhsach/?IDLopHoc=${selectedLop}`);
+      const danhSachHS = hsRes.data;
+      setHocSinhList(danhSachHS);
+
+      const diemRes = await api.get(`/api/grading/diem/?IDLopHoc=${selectedLop}&IDMonHoc=${selectedMonHoc}&IDHocKy=${selectedHocKy}`);
+      const diemMap = {};
+      diemRes.data.forEach((hs) => {
+        diemMap[hs.id] = {
+          Diem15: hs.Diem15 === null ? "" : hs.Diem15,
+          Diem1Tiet: hs.Diem1Tiet === null ? "" : hs.Diem1Tiet,
+        };
       });
+      setDiemData(diemMap);
 
-      const students = await Promise.all(
-        res.data.map(async (hs) => {
-          const diemRes = await api.get("/api/grading/diem/", {
-            params: {
-              IDHocSinh: hs.id,
-              IDLopHoc: selectedLop,
-              IDMonHoc: selectedMon,
-              IDHocKy: selectedHocKy
-            }
-          });
-
-          const diem = diemRes.data[0] || {};
-          return {
-            ...hs,
-            diemId: diem.id || null,
-            DiemMieng: diem.DiemMieng ?? "",
-            Diem15Phut: diem.Diem15Phut ?? "",
-            Diem1Tiet: diem.Diem1Tiet ?? "",
-            DiemHocKy: diem.DiemHocKy ?? ""
-          };
-        })
-      );
-
-      setDanhSach(students);
+      if (danhSachHS.length === 0) {
+        setMessage({ variant: "info", text: "Không có học sinh trong lớp đã chọn." });
+      }
     } catch (error) {
-      console.error("Lỗi khi tải danh sách học sinh:", error);
+      console.error("Lỗi khi tải danh sách:", error);
+      setMessage({ variant: "danger", text: "Không thể tải danh sách học sinh hoặc điểm." });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleChange = (index, field, value) => {
-    const updated = [...danhSach];
-    updated[index][field] = value;
-    setDanhSach(updated);
+  const handleDiemChange = (id, field, value) => {
+    setDiemData((prev) => ({
+      ...prev,
+      [id]: { ...prev[id], [field]: value },
+    }));
   };
 
-  const safeParseFloat = (value) => {
-    const parsed = parseFloat(value);
-    return isNaN(parsed) ? null : parsed;
-  };
-
-  const handleLuu = async (hs) => {
-    const payload = {
-      IDHocSinh: hs.id,
-      IDLopHoc: selectedLop,
-      IDMonHoc: selectedMon,
-      IDHocKy: selectedHocKy,
-      DiemMieng: safeParseFloat(hs.DiemMieng),
-      Diem15Phut: safeParseFloat(hs.Diem15Phut),
-      Diem1Tiet: safeParseFloat(hs.Diem1Tiet),
-      DiemHocKy: safeParseFloat(hs.DiemHocKy),
-    };
+  const handleLuuDiem = async () => {
+    setLoading(true);
+    setMessage(null);
 
     try {
-      if (hs.diemId) {
-        await api.put(`/api/grading/capnhat/${hs.diemId}/`, payload);
-        setThongBao(`✅ Đã cập nhật điểm cho ${hs.HoTen}`);
-      } else {
-        await api.post("/api/grading/nhap/", payload);
-        setThongBao(`✅ Đã lưu điểm cho ${hs.HoTen}`);
+      for (const hs of hocSinhList) {
+        const diem = diemData[hs.id] || {};
+        const diem15 = diem.Diem15 === "" || diem.Diem15 == null ? 0 : parseFloat(diem.Diem15);
+        const diem1tiet = diem.Diem1Tiet === "" || diem.Diem1Tiet == null ? 0 : parseFloat(diem.Diem1Tiet);
+
+        const payload = {
+          IDHocSinh: hs.id,
+          IDLopHoc: selectedLop,
+          IDMonHoc: selectedMonHoc,
+          IDHocKy: selectedHocKy,
+          Diem15: diem15,
+          Diem1Tiet: diem1tiet,
+        };
+
+        try {
+          await api.put("/api/grading/capnhat/", payload);
+        } catch (err) {
+          if (err.response?.status === 404) {
+            await api.post("/api/grading/nhap/", payload);
+          } else throw err;
+        }
       }
+
+      setMessage({ variant: "success", text: "Lưu điểm thành công!" });
+      await handleXuatDanhSach();
     } catch (err) {
-      console.error(err);
-      if (err.response?.data) {
-        setThongBao(`❌ ${hs.HoTen}: ${JSON.stringify(err.response.data)}`);
-      } else {
-        setThongBao(`❌ Lỗi khi lưu điểm cho ${hs.HoTen}`);
-      }
+      console.error("Lỗi lưu điểm:", err);
+      setMessage({
+        variant: "danger",
+        text: err.response?.data?.detail || "Lỗi khi lưu điểm.",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="dashboard-container">
-      <Container fluid className="px-4 py-4">
-        <div className="welcome-banner p-4 rounded-4 position-relative overflow-hidden mb-4">
-          <div className="banner-bg-animation">
-            <div className="floating-orb orb-1"></div>
-            <div className="floating-orb orb-2"></div>
-            <div className="floating-orb orb-3"></div>
-          </div>
-          <div className="welcome-content d-flex align-items-center">
-            <div className="banner-avatar-section me-4">
-              <div className="avatar-container">
-                <div className="avatar-main">
-                  <div className="avatar-placeholder">
-                    <FaChalkboardTeacher size={32} className="text-white avatar-icon" />
-                  </div>
+    <Container fluid className="px-4 py-4">
+      {/* Banner biển xanh */}
+      <div className="welcome-banner p-4 rounded-4 position-relative overflow-hidden mb-4">
+        <div className="banner-bg-animation">
+          <div className="floating-orb orb-1"></div>
+          <div className="floating-orb orb-2"></div>
+          <div className="floating-orb orb-3"></div>
+          <div className="floating-orb orb-4"></div>
+          <div className="floating-orb orb-5"></div>
+        </div>
+        <div className="grid-pattern"></div>
+        <div className="wave-animation">
+          <div className="wave wave-1"></div>
+          <div className="wave wave-2"></div>
+          <div className="wave wave-3"></div>
+        </div>
+        <div className="particles">
+          <div className="particle particle-1"></div>
+          <div className="particle particle-2"></div>
+          <div className="particle particle-3"></div>
+          <div className="particle particle-4"></div>
+          <div className="particle particle-5"></div>
+          <div className="particle particle-6"></div>
+        </div>
+        <div className="shimmer-effect"></div>
+        <div className="welcome-content d-flex align-items-center">
+          <div className="banner-avatar-section me-4">
+            <div className="avatar-container">
+              <div className="avatar-main">
+                <div className="avatar-placeholder">
+                  <FaClipboardList size={32} className="text-white avatar-icon" />
                 </div>
               </div>
+              <div className="avatar-ring ring-1"></div>
+              <div className="avatar-ring ring-2"></div>
+              <div className="avatar-pulse pulse-1"></div>
+              <div className="avatar-pulse pulse-2"></div>
+              <div className="avatar-glow"></div>
             </div>
-            <div>
-              <h2 className="text-white mb-1 fw-bold banner-title">Quản lý điểm học sinh</h2>
-              <p className="text-white-75 mb-0 banner-subtitle">Nhập và cập nhật điểm nhanh chóng, trực quan</p>
-            </div>
+          </div>
+          <div>
+            <h2 className="text-white mb-1 fw-bold banner-title">Quản lý điểm</h2>
+            <p className="text-white-75 mb-0 banner-subtitle">Nhập, cập nhật và xuất bảng điểm học sinh</p>
           </div>
         </div>
+      </div>
 
-        <Card className="p-4 shadow-sm border-0">
-          <Row className="mb-4">
-            <Col md={3}><Form.Label>Niên khóa</Form.Label><Form.Select value={selectedNienKhoa} onChange={(e) => setSelectedNienKhoa(e.target.value)}><option value="">-- Chọn niên khóa --</option>{nienKhoaOptions.map((nk) => (<option key={nk.id} value={nk.id}>{nk.TenNienKhoa}</option>))}</Form.Select></Col>
-            <Col md={3}><Form.Label>Lớp</Form.Label><Form.Select value={selectedLop} onChange={(e) => setSelectedLop(e.target.value)}><option value="">-- Chọn lớp --</option>{lopOptions.map((lop) => (<option key={lop.id} value={lop.id}>{lop.TenLop}</option>))}</Form.Select></Col>
-            <Col md={3}><Form.Label>Môn học</Form.Label><Form.Select value={selectedMon} onChange={(e) => setSelectedMon(e.target.value)}><option value="">-- Chọn môn --</option>{monOptions.map((mon) => (<option key={mon.id} value={mon.id}>{mon.TenMonHoc}</option>))}</Form.Select></Col>
-            <Col md={3}><Form.Label>Học kỳ</Form.Label><Form.Select value={selectedHocKy} onChange={(e) => setSelectedHocKy(e.target.value)}><option value="">-- Chọn học kỳ --</option>{hocKyOptions.map((hk) => (<option key={hk.id} value={hk.id}>{hk.TenHocKy}</option>))}</Form.Select></Col>
-          </Row>
+      {/* Card nội dung */}
+      <Card className="shadow-sm">
+        <Card.Body>
+          <Card className="mb-4 border-0 bg-light">
+            <Card.Body>
+              <Row className="gy-2 gx-3">
+                <Col md={3}>
+                  <Form.Select value={selectedNienKhoa} onChange={(e) => setSelectedNienKhoa(e.target.value)}>
+                    <option value="">-- Niên khóa --</option>
+                    {nienKhoaList.map((nk) => (
+                      <option key={nk.id} value={nk.id}>{nk.TenNienKhoa}</option>
+                    ))}
+                  </Form.Select>
+                </Col>
+                <Col md={3}>
+                  <Form.Select value={selectedLop} onChange={(e) => setSelectedLop(e.target.value)}>
+                    <option value="">-- Lớp học --</option>
+                    {lopList.map((lop) => (
+                      <option key={lop.id} value={lop.id}>{lop.TenLop}</option>
+                    ))}
+                  </Form.Select>
+                </Col>
+                <Col md={3}>
+                  <Form.Select value={selectedMonHoc} onChange={(e) => setSelectedMonHoc(e.target.value)}>
+                    <option value="">-- Môn học --</option>
+                    {monHocList.map((mon) => (
+                      <option key={mon.id} value={mon.id}>{mon.TenMonHoc}</option>
+                    ))}
+                  </Form.Select>
+                </Col>
+                <Col md={2}>
+                  <Form.Select value={selectedHocKy} onChange={(e) => setSelectedHocKy(e.target.value)}>
+                    <option value="">-- Học kỳ --</option>
+                    {hocKyList.map((hk) => (
+                      <option key={hk.id} value={hk.id}>{hk.TenHocKy}</option>
+                    ))}
+                  </Form.Select>
+                </Col>
+                <Col md={1}>
+                  <Button variant="outline-primary" onClick={handleXuatDanhSach} disabled={!daChonDayDu || loading} className="w-100">
+                    {loading ? <Spinner size="sm" animation="border" /> : "Xuất"}
+                  </Button>
+                </Col>
+              </Row>
+            </Card.Body>
+          </Card>
 
-          <div className="text-center mb-4">
-            <Button onClick={fetchDanhSachHocSinh} className="px-4">📋 Tải danh sách học sinh</Button>
-          </div>
-
-          {loading ? (
-            <div className="text-center">
-              <Spinner animation="border" />
-            </div>
-          ) : (
-            <Table striped bordered hover responsive className="align-middle">
-              <thead className="table-primary text-center">
-                <tr>
-                  <th>#</th>
-                  <th>Họ tên</th>
-                  <th>Miệng</th>
-                  <th>15 phút</th>
-                  <th>1 tiết</th>
-                  <th>Học kỳ</th>
-                  <th>Lưu</th>
-                </tr>
-              </thead>
-              <tbody>
-                {danhSach.map((hs, idx) => (
-                  <tr key={hs.id}>
-                    <td className="text-center">{idx + 1}</td>
-                    <td>{hs.HoTen}</td>
-                    <td><Form.Control type="number" value={hs.DiemMieng} onChange={(e) => handleChange(idx, "DiemMieng", e.target.value)} /></td>
-                    <td><Form.Control type="number" value={hs.Diem15Phut} onChange={(e) => handleChange(idx, "Diem15Phut", e.target.value)} /></td>
-                    <td><Form.Control type="number" value={hs.Diem1Tiet} onChange={(e) => handleChange(idx, "Diem1Tiet", e.target.value)} /></td>
-                    <td><Form.Control type="number" value={hs.DiemHocKy} onChange={(e) => handleChange(idx, "DiemHocKy", e.target.value)} /></td>
-                    <td className="text-center">
-                      <Button size="sm" variant="success" onClick={() => handleLuu(hs)} disabled={hs.DiemMieng === "" || hs.Diem15Phut === "" || hs.Diem1Tiet === "" || hs.DiemHocKy === ""}>💾 Lưu</Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
+          {message && (
+            <Alert variant={message.variant} dismissible onClose={() => setMessage(null)}>
+              {message.text}
+            </Alert>
           )}
 
-          {thongBao && <Alert variant="info" className="mt-3">{thongBao}</Alert>}
-        </Card>
-      </Container>
-    </div>
+          {hocSinhList.length > 0 && (
+            <Card className="mt-3 shadow-sm rounded-4">
+              <Card.Body>
+                <Table striped bordered hover responsive>
+                  <thead className="table-light">
+                    <tr>
+                      <th>#</th>
+                      <th>Họ tên học sinh</th>
+                      <th>Điểm 15 phút</th>
+                      <th>Điểm 1 tiết</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {hocSinhList.map((hs, idx) => (
+                      <tr key={hs.id}>
+                        <td>{idx + 1}</td>
+                        <td>{hs.HoTen}</td>
+                        <td>
+                          <Form.Control
+                            type="number"
+                            min={0}
+                            max={10}
+                            step="0.1"
+                            value={diemData[hs.id]?.Diem15 ?? ""}
+                            onChange={(e) => handleDiemChange(hs.id, "Diem15", e.target.value)}
+                          />
+                        </td>
+                        <td>
+                          <Form.Control
+                            type="number"
+                            min={0}
+                            max={10}
+                            step="0.1"
+                            value={diemData[hs.id]?.Diem1Tiet ?? ""}
+                            onChange={(e) => handleDiemChange(hs.id, "Diem1Tiet", e.target.value)}
+                          />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+                <div className="text-end">
+                  <Button variant="success" onClick={handleLuuDiem} disabled={loading}>
+                    {loading ? <Spinner size="sm" animation="border" /> : "Lưu điểm"}
+                  </Button>
+                </div>
+              </Card.Body>
+            </Card>
+          )}
+        </Card.Body>
+      </Card>
+    </Container>
   );
 };
 

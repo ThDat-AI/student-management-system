@@ -3,8 +3,6 @@ from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
-from django.db.models import Q
-from django.shortcuts import get_object_or_404
 from datetime import date
 
 from .models import HocSinh
@@ -18,17 +16,14 @@ from classes.models import LopHoc, LopHoc_HocSinh
 
 class HocSinhViewSet(viewsets.ModelViewSet):
     queryset = HocSinh.objects.all().select_related(
-        'IDNienKhoaTiepNhan',
-        'NguoiTao',
-        'NguoiCapNhat'
-    ).order_by('-NgayTao')
-    
+        'IDNienKhoaTiepNhan'
+    ).order_by('Ho', 'Ten')  # ✅ sắp xếp theo họ tên
+
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = {
         'IDNienKhoaTiepNhan': ['exact'],
         'GioiTinh': ['exact'],
-        'TrangThai': ['exact'],
         'NgaySinh': ['gte', 'lte'],
     }
     search_fields = ['Ho', 'Ten', 'Email', 'DiaChi']
@@ -42,7 +37,7 @@ class HocSinhViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        
+
         # Lọc theo lớp học nếu có tham số class_id
         class_id = self.request.query_params.get('class_id')
         if class_id:
@@ -50,7 +45,7 @@ class HocSinhViewSet(viewsets.ModelViewSet):
                 IDLopHoc_id=class_id
             ).values_list('IDHocSinh_id', flat=True)
             queryset = queryset.filter(id__in=student_ids)
-        
+
         # Lọc theo khoảng tuổi
         min_age = self.request.query_params.get('min_age')
         max_age = self.request.query_params.get('max_age')
@@ -62,17 +57,14 @@ class HocSinhViewSet(viewsets.ModelViewSet):
             if max_age:
                 max_birth_year = today.year - int(max_age)
                 queryset = queryset.filter(NgaySinh__gte=date(max_birth_year, 1, 1))
-        
+
         return queryset
 
     def perform_create(self, serializer):
-        serializer.save(
-            NguoiTao=self.request.user,
-            NguoiCapNhat=self.request.user
-        )
+        serializer.save()
 
     def perform_update(self, serializer):
-        serializer.save(NguoiCapNhat=self.request.user)
+        serializer.save()
 
     @action(detail=True, methods=['GET'])
     def thong_tin_lop_hoc(self, request, pk=None):
@@ -81,13 +73,13 @@ class HocSinhViewSet(viewsets.ModelViewSet):
         lop_hoc = hoc_sinh.lophoc_hocsinh_set.filter(
             IDLopHoc__IDNienKhoa=hoc_sinh.IDNienKhoaTiepNhan
         ).first()
-        
+
         if not lop_hoc:
             return Response(
                 {"detail": "Học sinh chưa được phân lớp"},
                 status=status.HTTP_404_NOT_FOUND
             )
-        
+
         data = {
             "lop_hoc_id": lop_hoc.IDLopHoc.id,
             "ten_lop": lop_hoc.IDLopHoc.TenLop,
@@ -105,7 +97,7 @@ class HocSinhViewSet(viewsets.ModelViewSet):
                 {"error": "Thiếu tham số nien_khoa_id"},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+
         queryset = self.get_queryset().filter(
             IDNienKhoaTiepNhan_id=nien_khoa_id
         )
@@ -117,14 +109,13 @@ class HocSinhViewSet(viewsets.ModelViewSet):
         """Phân lớp cho học sinh"""
         hoc_sinh = self.get_object()
         lop_hoc_id = request.data.get('lop_hoc_id')
-        
+
         if not lop_hoc_id:
             return Response(
                 {"error": "Thiếu tham số lop_hoc_id"},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
-        # Kiểm tra lớp học có cùng niên khóa với học sinh
+
         try:
             lop_hoc = LopHoc.objects.get(
                 id=lop_hoc_id,
@@ -135,8 +126,7 @@ class HocSinhViewSet(viewsets.ModelViewSet):
                 {"error": "Lớp học không tồn tại hoặc khác niên khóa"},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
-        # Kiểm tra học sinh đã ở trong lớp này chưa
+
         if LopHoc_HocSinh.objects.filter(
             IDHocSinh=hoc_sinh,
             IDLopHoc=lop_hoc
@@ -145,36 +135,15 @@ class HocSinhViewSet(viewsets.ModelViewSet):
                 {"error": "Học sinh đã có trong lớp này"},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
-        # Thực hiện phân lớp
+
         LopHoc_HocSinh.objects.create(
             IDHocSinh=hoc_sinh,
             IDLopHoc=lop_hoc
         )
-        
+
         return Response(
             {"success": f"Đã phân học sinh vào lớp {lop_hoc.TenLop}"},
             status=status.HTTP_201_CREATED
-        )
-
-    @action(detail=True, methods=['PATCH'])
-    def cap_nhat_trang_thai(self, request, pk=None):
-        """Cập nhật trạng thái học sinh"""
-        hoc_sinh = self.get_object()
-        trang_thai = request.data.get('trang_thai')
-        
-        if trang_thai not in dict(HocSinh.TRANG_THAI_CHOICES).keys():
-            return Response(
-                {"error": "Trạng thái không hợp lệ"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        hoc_sinh.TrangThai = trang_thai
-        hoc_sinh.NguoiCapNhat = request.user
-        hoc_sinh.save()
-        
-        return Response(
-            {"success": f"Cập nhật trạng thái thành {hoc_sinh.get_TrangThai_display()}"}
         )
 
 @api_view(['GET'])
@@ -198,7 +167,7 @@ def danh_sach_hoc_sinh_theo_lop(request):
         {
             "id": hs.id,
             "HoTen": f"{hs.Ho} {hs.Ten}",
-            "MaHocSinh": hs.id,  # Thêm trường ID nếu cần
+            "MaHocSinh": hs.id,
             "GioiTinh": hs.GioiTinh,
             "NgaySinh": hs.NgaySinh.strftime("%d/%m/%Y") if hs.NgaySinh else None
         }

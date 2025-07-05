@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import HocKy, DiemSo, DiemSoLichSu
+from .models import HocKy, DiemSo
 
 @admin.register(HocKy)
 class HocKyAdmin(admin.ModelAdmin):
@@ -7,8 +7,4 @@ class HocKyAdmin(admin.ModelAdmin):
 
 @admin.register(DiemSo)
 class DiemSoAdmin(admin.ModelAdmin):
-    pass
-
-@admin.register(DiemSoLichSu)
-class DiemSoLichSuAdmin(admin.ModelAdmin):
     pass

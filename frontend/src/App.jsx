@@ -24,7 +24,7 @@ import BGHDashboard from "./pages/BGH/BGHDashboard";
 import AccountManagement from "./pages/BGH/AccountManagement/AccountManagement";
 import QuyDinhManagement from "./pages/BGH/QuyDinhManagement";
 import LopHocManagement from "./pages/GiaoVu/LopHocManagement"; // dùng chung với giáo vụ
-import XuatBaoCaoBGH from "./pages/BGH/XuatBaoCaoBGH";
+import TongHopDiemBGH from "./pages/BGH/TongHopDiemBGH";
 import QuanLyDiemBGHWrapper from "./pages/BGH/QuanLyDiemBGHWrapper"; // ✅ wrapper quản lý điểm cho BGH
 
 // ======================= Giáo vụ Pages =======================
@@ -39,7 +39,6 @@ import GiaoVienDashboard from "./pages/GiaoVien/GiaoVienDashboard";
 import QuanLyDiemGVWrapper from "./pages/GiaoVien/QuanLyDiemGVWrapper";
 import QuanLyDiemGV from "./pages/GiaoVien/QuanLyDiemGV";
 import TongHopDiemGV from "./pages/GiaoVien/TongHopDiemGV";
-import XuatBaoCaoGV from "./pages/GiaoVien/XuatBaoCaoGV";
 
 function App() {
   return (
@@ -71,7 +70,7 @@ function App() {
                   <Route path="bgh/quydinh" element={<QuyDinhManagement />} />
                   <Route path="bgh/lophoc" element={<LopHocManagement />} />
                   <Route path="bgh/quan-ly-diem" element={<QuanLyDiemBGHWrapper />} /> {/* ✅ gộp quản lý điểm */}
-                  <Route path="bgh/xuat-bao-cao" element={<XuatBaoCaoBGH />} /> {/* dùng trong wrapper */}
+                  <Route path="bgh/xuat-bao-cao" element={<TongHopDiemBGH />} /> {/* dùng trong wrapper */}
                 </Route>
 
                 {/* =================== Giáo vụ Routes =================== */}
@@ -90,7 +89,6 @@ function App() {
                   <Route path="giaovien/quan-ly-diem" element={<QuanLyDiemGVWrapper />} />
                   <Route path="giaovien/quan-ly-diem/nhap" element={<QuanLyDiemGV />} />
                   <Route path="giaovien/quan-ly-diem/tong-hop" element={<TongHopDiemGV />} />
-                  <Route path="giaovien/quan-ly-diem/xuat-bao-cao" element={<XuatBaoCaoGV />} />
                 </Route>
               </Route>
             </Route>

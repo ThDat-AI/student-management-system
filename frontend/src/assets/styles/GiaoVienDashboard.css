@@ -1,4 +1,4 @@
-/* GiaoVienrDashboard.css */
+/* GiaoVienDashboard.css */
 
 .dashboard-container { 
   background-color: #f8f9fa; 
@@ -11,7 +11,7 @@
 
 /* ENHANCED ANIMATED BANNER */
 .welcome-banner { 
-  background: linear-gradient(135deg, #36d1dc 0%, #5b86e5 100%); /* Teacher-themed gradient */
+  background: linear-gradient(135deg, #f67b5d 0%, #feb47b 100%);
   box-shadow: 0 20px 40px rgba(54, 209, 220, 0.3);
   border-radius: 20px;
   position: relative;

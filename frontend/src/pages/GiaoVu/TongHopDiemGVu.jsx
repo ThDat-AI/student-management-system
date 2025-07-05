@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
   Container,
+  Card,
   Row,
   Col,
   Form,
@@ -8,253 +9,254 @@ import {
   Table,
   Spinner,
   Alert,
-  Card,
 } from "react-bootstrap";
+import { FaClipboardList } from "react-icons/fa";
 import api from "../../api";
-import { useLayout } from "../../contexts/LayoutContext";
-import { FaChartBar } from "react-icons/fa";
-import "../../assets/styles/GiaoVienDashboard.css";
+import "../../assets/styles/GiaoVuDashboard.css";
 
 const TongHopDiemGVu = () => {
-  const { setPageTitle } = useLayout();
-
-  const [nienKhoaOptions, setNienKhoaOptions] = useState([]);
-  const [lopOptions, setLopOptions] = useState([]);
-  const [hocKyOptions, setHocKyOptions] = useState([]);
-  const [monOptions, setMonOptions] = useState([]);
-  const [filterType, setFilterType] = useState("lop");
+  const [nienKhoaList, setNienKhoaList] = useState([]);
+  const [lopList, setLopList] = useState([]);
+  const [hocKyList, setHocKyList] = useState([]);
 
   const [selectedNienKhoa, setSelectedNienKhoa] = useState("");
   const [selectedLop, setSelectedLop] = useState("");
   const [selectedHocKy, setSelectedHocKy] = useState("");
-  const [selectedMon, setSelectedMon] = useState("");
 
-  const [danhSach, setDanhSach] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [thongBao, setThongBao] = useState("");
+  const [tongHopData, setTongHopData] = useState([]);
+  const [message, setMessage] = useState(null);
 
   useEffect(() => {
-    setPageTitle("Tổng hợp điểm học kỳ - Giáo vụ");
-    fetchDropdowns();
+    api.get("/api/configurations/nienkhoa/").then((res) => setNienKhoaList(res.data));
+    api.get("/api/classes/lop/").then((res) => setLopList(res.data));
+    api.get("/api/grading/hocky/").then((res) => setHocKyList(res.data));
   }, []);
 
-  useEffect(() => {
-    if (selectedNienKhoa) {
-      fetchLopTheoNienKhoa(selectedNienKhoa);
-    } else {
-      setLopOptions([]);
-    }
-  }, [selectedNienKhoa]);
-
-  const fetchDropdowns = async () => {
-    try {
-      const [nkRes, monRes, hkRes] = await Promise.all([
-        api.get("/api/configurations/nienkhoa/"),
-        api.get("/api/subjects/monhoc/"),
-        api.get("/api/grading/hocky/"),
-      ]);
-      setNienKhoaOptions(nkRes.data);
-      setMonOptions(monRes.data);
-      setHocKyOptions(hkRes.data);
-    } catch (error) {
-      console.error("Lỗi tải dữ liệu:", error);
-    }
+  const getTenLop = () => {
+    return lopList.find((lop) => lop.id === parseInt(selectedLop))?.TenLop || "N/A";
   };
 
-  const fetchLopTheoNienKhoa = async (idNienKhoa) => {
-    try {
-      const res = await api.get("/api/classes/lop/", {
-        params: { IDNienKhoa: idNienKhoa },
-      });
-      setLopOptions(res.data);
-    } catch (error) {
-      console.error("Lỗi khi tải lớp:", error);
-    }
+  const getTenHocKy = () => {
+    return hocKyList.find((hk) => hk.id === parseInt(selectedHocKy))?.TenHocKy || "N/A";
   };
 
   const handleTongHop = async () => {
-    if (!selectedNienKhoa || !selectedHocKy || !selectedMon) {
-      alert("Vui lòng chọn đầy đủ niên khóa, môn học và học kỳ.");
-      return;
-    }
-
-    if (filterType === "lop" && !selectedLop) {
-      alert("Vui lòng chọn lớp.");
+    if (!selectedNienKhoa || !selectedLop || !selectedHocKy) {
+      setMessage({ variant: "warning", text: "Vui lòng chọn đầy đủ niên khóa, lớp và học kỳ." });
       return;
     }
 
     setLoading(true);
-    setThongBao("");
-    setDanhSach([]);
+    setMessage(null);
+    setTongHopData([]);
 
     try {
-      const payload = {
+      const res = await api.post("/api/grading/tonghop/", {
+        IDLopHoc: selectedLop,
         IDHocKy: selectedHocKy,
-        IDMonHoc: selectedMon,
-        IDNienKhoa: selectedNienKhoa,
-      };
+      });
 
-      if (filterType === "lop") {
-        payload.IDLopHoc = selectedLop;
-      } else if (filterType === "khoi") {
-        payload.PhamVi = "khoi";
-      } else if (filterType === "tatca") {
-        payload.PhamVi = "tatca";
+      if (Array.isArray(res.data)) {
+        setTongHopData(res.data);
+        if (res.data.length === 0) {
+          setMessage({ variant: "info", text: "Không có dữ liệu tổng hợp cho lựa chọn đã chọn." });
+        }
+      } else {
+        setMessage({ variant: "danger", text: "Dữ liệu không hợp lệ." });
       }
-
-      const res = await api.post("/api/grading/tonghop/", payload);
-      setDanhSach(res.data);
-      setThongBao("✅ Đã tổng hợp điểm thành công.");
     } catch (err) {
-      console.error("Lỗi tổng hợp:", err);
-      setThongBao("❌ Lỗi khi tổng hợp điểm. Vui lòng kiểm tra dữ liệu.");
+      console.error("Lỗi tổng hợp điểm:", err);
+      setMessage({
+        variant: "danger",
+        text: err.response?.data?.detail || "Lỗi khi tổng hợp điểm.",
+      });
     } finally {
       setLoading(false);
     }
   };
 
+  const handleXuatExcel = async () => {
+    if (!selectedNienKhoa || !selectedLop || !selectedHocKy) {
+      setMessage({ variant: "warning", text: "Vui lòng chọn đầy đủ trước khi xuất." });
+      return;
+    }
+
+    setMessage(null);
+    try {
+      const res = await api.post(
+        "/api/grading/xuatbaocao/",
+        {
+          IDLopHoc: selectedLop,
+          IDHocKy: selectedHocKy,
+        },
+        { responseType: "blob" }
+      );
+
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement("a");
+      link.href = url;
+
+      const lop = getTenLop();
+      const hk = getTenHocKy();
+      const nk = nienKhoaList.find((n) => n.id === parseInt(selectedNienKhoa))?.TenNienKhoa || "NienKhoa";
+
+      link.setAttribute("download", `BaoCao_${lop}_${hk}_${nk}.xlsx`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (err) {
+      console.error("Lỗi xuất Excel:", err);
+      setMessage({
+        variant: "danger",
+        text: err.response?.data?.detail || "Lỗi khi xuất báo cáo.",
+      });
+    }
+  };
+
   return (
-    <div className="dashboard-container">
-      <Container fluid className="px-4 py-4">
-        <div className="welcome-banner p-4 rounded-4 position-relative overflow-hidden mb-4">
-          <div className="banner-bg-animation">
-            <div className="floating-orb orb-1"></div>
-            <div className="floating-orb orb-2"></div>
-            <div className="floating-orb orb-3"></div>
-            <div className="floating-orb orb-4"></div>
-            <div className="floating-orb orb-5"></div>
-          </div>
-          <div className="grid-pattern"></div>
-          <div className="wave-animation">
-            <div className="wave wave-1"></div>
-            <div className="wave wave-2"></div>
-            <div className="wave wave-3"></div>
-          </div>
-          <div className="particles">
-            <div className="particle particle-1"></div>
-            <div className="particle particle-2"></div>
-            <div className="particle particle-3"></div>
-            <div className="particle particle-4"></div>
-            <div className="particle particle-5"></div>
-            <div className="particle particle-6"></div>
-          </div>
-          <div className="shimmer-effect"></div>
-          <div className="welcome-content d-flex align-items-center">
-            <div className="banner-avatar-section me-4">
-              <div className="avatar-container">
-                <div className="avatar-main">
-                  <div className="avatar-placeholder">
-                    <FaChartBar size={32} className="text-white avatar-icon" />
-                  </div>
+    <Container fluid className="px-4 py-4">
+      {/* Banner */}
+      <div className="welcome-banner p-4 rounded-4 position-relative overflow-hidden mb-4">
+        <div className="banner-bg-animation">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className={`floating-orb orb-${i}`}></div>
+          ))}
+        </div>
+        <div className="grid-pattern"></div>
+        <div className="wave-animation">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className={`wave wave-${i}`}></div>
+          ))}
+        </div>
+        <div className="particles">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className={`particle particle-${i}`}></div>
+          ))}
+        </div>
+        <div className="shimmer-effect"></div>
+        <div className="welcome-content d-flex align-items-center">
+          <div className="banner-avatar-section me-4">
+            <div className="avatar-container">
+              <div className="avatar-main">
+                <div className="avatar-placeholder">
+                  <FaClipboardList size={32} className="text-white avatar-icon" />
                 </div>
-                <div className="avatar-ring ring-1"></div>
-                <div className="avatar-ring ring-2"></div>
-                <div className="avatar-pulse pulse-1"></div>
-                <div className="avatar-pulse pulse-2"></div>
-                <div className="avatar-glow"></div>
               </div>
+              <div className="avatar-ring ring-1"></div>
+              <div className="avatar-ring ring-2"></div>
+              <div className="avatar-pulse pulse-1"></div>
+              <div className="avatar-pulse pulse-2"></div>
+              <div className="avatar-glow"></div>
             </div>
-            <div>
-              <h2 className="text-white mb-1 fw-bold banner-title">Tổng hợp điểm học kỳ</h2>
-              <p className="text-white-75 mb-0 banner-subtitle">Phân tích, thống kê và quản lý điểm toàn trường</p>
-            </div>
+          </div>
+          <div>
+            <h2 className="text-white mb-1 fw-bold banner-title">Tổng hợp điểm học kỳ</h2>
+            <p className="text-white-75 mb-0 banner-subtitle">
+              Giáo vụ theo dõi và tổng hợp điểm theo lớp, khối, học kỳ
+            </p>
           </div>
         </div>
+      </div>
 
-        <Card className="p-4 shadow-sm border-0">
-          <h4 className="mb-4 text-primary text-center fw-bold">Tổng hợp điểm học kỳ (Giáo vụ)</h4>
+      {/* Nội dung */}
+      <Card className="shadow-sm">
+        <Card.Body>
+          {/* Bộ lọc */}
+          <Card className="mb-3 bg-light border-0">
+            <Card.Body>
+              <Row className="gy-2 gx-3">
+                <Col md={4}>
+                  <Form.Select
+                    value={selectedNienKhoa}
+                    onChange={(e) => setSelectedNienKhoa(e.target.value)}
+                  >
+                    <option value="">-- Chọn niên khóa --</option>
+                    {nienKhoaList.map((nk) => (
+                      <option key={nk.id} value={nk.id}>{nk.TenNienKhoa}</option>
+                    ))}
+                  </Form.Select>
+                </Col>
+                <Col md={4}>
+                  <Form.Select
+                    value={selectedLop}
+                    onChange={(e) => setSelectedLop(e.target.value)}
+                  >
+                    <option value="">-- Chọn lớp --</option>
+                    {lopList.map((lop) => (
+                      <option key={lop.id} value={lop.id}>{lop.TenLop}</option>
+                    ))}
+                  </Form.Select>
+                </Col>
+                <Col md={4}>
+                  <Form.Select
+                    value={selectedHocKy}
+                    onChange={(e) => setSelectedHocKy(e.target.value)}
+                  >
+                    <option value="">-- Chọn học kỳ --</option>
+                    {hocKyList.map((hk) => (
+                      <option key={hk.id} value={hk.id}>{hk.TenHocKy}</option>
+                    ))}
+                  </Form.Select>
+                </Col>
+              </Row>
 
-          <Row className="mb-3">
-            <Col md={3}>
-              <Form.Label>Niên khóa</Form.Label>
-              <Form.Select value={selectedNienKhoa} onChange={(e) => setSelectedNienKhoa(e.target.value)}>
-                <option value="">-- Chọn niên khóa --</option>
-                {nienKhoaOptions.map((nk) => (
-                  <option key={nk.id} value={nk.id}>{nk.TenNienKhoa}</option>
-                ))}
-              </Form.Select>
-            </Col>
-            <Col md={3}>
-              <Form.Label>Môn học</Form.Label>
-              <Form.Select value={selectedMon} onChange={(e) => setSelectedMon(e.target.value)}>
-                <option value="">-- Chọn môn học --</option>
-                {monOptions.map((mon) => (
-                  <option key={mon.id} value={mon.id}>{mon.TenMonHoc}</option>
-                ))}
-              </Form.Select>
-            </Col>
-            <Col md={3}>
-              <Form.Label>Học kỳ</Form.Label>
-              <Form.Select value={selectedHocKy} onChange={(e) => setSelectedHocKy(e.target.value)}>
-                <option value="">-- Chọn học kỳ --</option>
-                {hocKyOptions.map((hk) => (
-                  <option key={hk.id} value={hk.id}>{hk.TenHocKy}</option>
-                ))}
-              </Form.Select>
-            </Col>
-            <Col md={3}>
-              <Form.Label>Phạm vi tổng hợp</Form.Label>
-              <Form.Select value={filterType} onChange={(e) => setFilterType(e.target.value)}>
-                <option value="lop">Một lớp cụ thể</option>
-                <option value="khoi">Toàn khối</option>
-                <option value="tatca">Toàn trường</option>
-              </Form.Select>
-            </Col>
-          </Row>
+              <div className="mt-3 d-flex justify-content-end gap-2">
+                <Button variant="outline-primary" onClick={handleTongHop} disabled={loading}>
+                  {loading ? <Spinner size="sm" animation="border" /> : "Tổng hợp điểm"}
+                </Button>
+                <Button variant="success" onClick={handleXuatExcel} disabled={loading}>
+                  {loading ? <Spinner size="sm" animation="border" /> : "Xuất Excel"}
+                </Button>
+              </div>
+            </Card.Body>
+          </Card>
 
-          {filterType === "lop" && (
-            <Row className="mb-3">
-              <Col md={3}>
-                <Form.Label>Chọn lớp</Form.Label>
-                <Form.Select value={selectedLop} onChange={(e) => setSelectedLop(e.target.value)}>
-                  <option value="">-- Chọn lớp --</option>
-                  {lopOptions.map((lop) => (
-                    <option key={lop.id} value={lop.id}>{lop.TenLop}</option>
-                  ))}
-                </Form.Select>
-              </Col>
-            </Row>
+          {/* Thông báo */}
+          {message && (
+            <Alert variant={message.variant} dismissible onClose={() => setMessage(null)}>
+              {message.text}
+            </Alert>
           )}
 
-          <div className="text-center mb-4">
-            <Button onClick={handleTongHop} className="px-4 btn-primary">
-              ⚙️ Tổng hợp điểm
-            </Button>
-          </div>
-
-          {loading ? (
-            <div className="text-center">
-              <Spinner animation="border" />
-            </div>
-          ) : danhSach.length > 0 ? (
-            <Table striped bordered hover responsive className="align-middle">
-              <thead className="table-success text-center">
-                <tr>
-                  <th>#</th>
-                  <th>Họ tên</th>
-                  <th>Lớp</th>
-                  <th>Điểm TB học kỳ</th>
-                  <th>Xếp loại</th>
-                </tr>
-              </thead>
-              <tbody>
-                {danhSach.map((hs, idx) => (
-                  <tr key={hs.id}>
-                    <td className="text-center">{idx + 1}</td>
-                    <td>{hs.HoTen}</td>
-                    <td className="text-center">{hs.TenLop ?? "-"}</td>
-                    <td className="text-center">{hs.DiemTBHocKy?.toFixed(2) ?? "-"}</td>
-                    <td className="text-center">{hs.XepLoai ?? "-"}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
-          ) : null}
-
-          {thongBao && <Alert variant="info">{thongBao}</Alert>}
-        </Card>
-      </Container>
-    </div>
+          {/* Bảng kết quả */}
+          {Array.isArray(tongHopData) && tongHopData.length > 0 && (
+            <Card className="shadow-sm rounded-4">
+              <Card.Body>
+                <Table striped bordered hover responsive>
+                  <thead className="table-light">
+                    <tr>
+                      <th>#</th>
+                      <th>Họ tên</th>
+                      <th>Lớp</th>
+                      <th>Học kỳ</th>
+                      <th>Điểm TB</th>
+                      <th>Xếp loại</th>
+                      <th>Thiếu điểm</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {tongHopData.map((hs, idx) => (
+                      <tr key={hs.id}>
+                        <td>{idx + 1}</td>
+                        <td>{hs.HoTen}</td>
+                        <td>{getTenLop()}</td>
+                        <td>{getTenHocKy()}</td>
+                        <td>{hs.DiemTB}</td>
+                        <td>{hs.XepLoai}</td>
+                        <td style={{ color: hs.CanhBao ? "red" : "green" }}>
+                          {hs.CanhBao ? "Có thiếu!" : "Không thiếu!"}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              </Card.Body>
+            </Card>
+          )}
+        </Card.Body>
+      </Card>
+    </Container>
   );
 };
 

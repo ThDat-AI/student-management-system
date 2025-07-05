@@ -1,6 +1,8 @@
+#subjects/urls.py
+
 from django.urls import path
-from .views import MonHocListView
+from .views import danh_sach_monhoc
 
 urlpatterns = [
-    path('monhoc/', MonHocListView.as_view()),
+    path('monhoc/', danh_sach_monhoc),
 ]

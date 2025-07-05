@@ -12,9 +12,9 @@ import {
 } from "react-bootstrap";
 import { FaClipboardList } from "react-icons/fa";
 import api from "../../api";
-import "../../assets/styles/BGHDashboard.css"; // dùng lại hiệu ứng sóng
+import "../../assets/styles/GiaoVienDashboard.css"; // dùng lại hiệu ứng nền
 
-const TongHopDiemGV = () => {
+const TongHopDiemBGH = () => {
   const [nienKhoaList, setNienKhoaList] = useState([]);
   const [lopList, setLopList] = useState([]);
   const [hocKyList, setHocKyList] = useState([]);
@@ -32,6 +32,14 @@ const TongHopDiemGV = () => {
     api.get("/api/classes/lop/").then((res) => setLopList(res.data));
     api.get("/api/grading/hocky/").then((res) => setHocKyList(res.data));
   }, []);
+
+  const getTenLop = () => {
+    return lopList.find((lop) => lop.id === parseInt(selectedLop))?.TenLop || "N/A";
+  };
+
+  const getTenHocKy = () => {
+    return hocKyList.find((hk) => hk.id === parseInt(selectedHocKy))?.TenHocKy || "N/A";
+  };
 
   const handleTongHop = async () => {
     if (!selectedNienKhoa || !selectedLop || !selectedHocKy) {
@@ -89,8 +97,8 @@ const TongHopDiemGV = () => {
       const link = document.createElement("a");
       link.href = url;
 
-      const lop = lopList.find((l) => l.id === parseInt(selectedLop))?.TenLop || "Lop";
-      const hk = hocKyList.find((h) => h.id === parseInt(selectedHocKy))?.TenHocKy || "HocKy";
+      const lop = getTenLop();
+      const hk = getTenHocKy();
       const nk = nienKhoaList.find((n) => n.id === parseInt(selectedNienKhoa))?.TenNienKhoa || "NienKhoa";
 
       link.setAttribute("download", `BaoCao_${lop}_${hk}_${nk}.xlsx`);
@@ -108,28 +116,23 @@ const TongHopDiemGV = () => {
 
   return (
     <Container fluid className="px-4 py-4">
-      {/* Banner biển xanh */}
+      {/* Banner */}
       <div className="welcome-banner p-4 rounded-4 position-relative overflow-hidden mb-4">
         <div className="banner-bg-animation">
-          <div className="floating-orb orb-1"></div>
-          <div className="floating-orb orb-2"></div>
-          <div className="floating-orb orb-3"></div>
-          <div className="floating-orb orb-4"></div>
-          <div className="floating-orb orb-5"></div>
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className={`floating-orb orb-${i}`}></div>
+          ))}
         </div>
         <div className="grid-pattern"></div>
         <div className="wave-animation">
-          <div className="wave wave-1"></div>
-          <div className="wave wave-2"></div>
-          <div className="wave wave-3"></div>
+          {[1, 2, 3].map((i) => (
+            <div key={i} className={`wave wave-${i}`}></div>
+          ))}
         </div>
         <div className="particles">
-          <div className="particle particle-1"></div>
-          <div className="particle particle-2"></div>
-          <div className="particle particle-3"></div>
-          <div className="particle particle-4"></div>
-          <div className="particle particle-5"></div>
-          <div className="particle particle-6"></div>
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className={`particle particle-${i}`}></div>
+          ))}
         </div>
         <div className="shimmer-effect"></div>
         <div className="welcome-content d-flex align-items-center">
@@ -149,7 +152,9 @@ const TongHopDiemGV = () => {
           </div>
           <div>
             <h2 className="text-white mb-1 fw-bold banner-title">Tổng hợp điểm học kỳ</h2>
-            <p className="text-white-75 mb-0 banner-subtitle">Xem điểm trung bình, xếp loại, và cảnh báo thiếu điểm</p>
+            <p className="text-white-75 mb-0 banner-subtitle">
+              Ban Giám Hiệu theo dõi chất lượng học tập của toàn trường
+            </p>
           </div>
         </div>
       </div>
@@ -220,6 +225,8 @@ const TongHopDiemGV = () => {
                     <tr>
                       <th>#</th>
                       <th>Họ tên</th>
+                      <th>Lớp</th>
+                      <th>Học kỳ</th>
                       <th>Điểm TB</th>
                       <th>Xếp loại</th>
                       <th>Thiếu điểm</th>
@@ -230,6 +237,8 @@ const TongHopDiemGV = () => {
                       <tr key={hs.id}>
                         <td>{idx + 1}</td>
                         <td>{hs.HoTen}</td>
+                        <td>{getTenLop()}</td>
+                        <td>{getTenHocKy()}</td>
                         <td>{hs.DiemTB}</td>
                         <td>{hs.XepLoai}</td>
                         <td style={{ color: hs.CanhBao ? "red" : "green" }}>
@@ -248,4 +257,5 @@ const TongHopDiemGV = () => {
   );
 };
 
-export default TongHopDiemGV;
+export default TongHopDiemBGH;
+

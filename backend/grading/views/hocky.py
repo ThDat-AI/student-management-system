@@ -1,10 +1,10 @@
-# grading/views/hocky.py
+#grading/views/hocky.py
 
-from rest_framework import generics, permissions
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 from grading.models import HocKy
-from grading.serializers import HocKySerializer
 
-class HocKyListView(generics.ListAPIView):
-    queryset = HocKy.objects.all()
-    serializer_class = HocKySerializer
-    permission_classes = [permissions.IsAuthenticated]
+@api_view(['GET'])
+def danh_sach_hocky(request):
+    ds = HocKy.objects.all().values('id', 'TenHocKy')
+    return Response(ds)

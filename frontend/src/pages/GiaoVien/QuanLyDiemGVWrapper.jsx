@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Container, Row, Col, Card, Button } from "react-bootstrap";
 import { FaPen, FaChartBar, FaFileExport, FaClipboardList } from "react-icons/fa";
 import { useLayout } from "../../contexts/LayoutContext";
-import '../../assets/styles/GiaoVienDashboard.css';
+import '../../assets/styles/BGHDashboard.css';
 
 const QuanLyDiemGVWrapper = () => {
   const navigate = useNavigate();
@@ -28,13 +28,6 @@ const QuanLyDiemGVWrapper = () => {
       color: "info",
       path: "/giaovien/quan-ly-diem/tong-hop"
     },
-    {
-      title: "Xuất báo cáo",
-      description: "Xuất bảng điểm và thống kê kết quả học tập.",
-      icon: <FaFileExport />, 
-      color: "success",
-      path: "/giaovien/quan-ly-diem/xuat-bao-cao"
-    }
   ];
 
   return (

@@ -18,10 +18,12 @@ urlpatterns = [
     path("api/accounts/", include("accounts.urls")),            # Người dùng, vai trò
     path("api/configurations/", include("configurations.urls")),# Niên khóa, tham số
     path("api/subjects/", include("subjects.urls")),            # Môn học, tổ hợp
+
     path("api/classes/", include("classes.urls")),              # Lớp học, khối
     path("api/students/", include("students.urls")),            # Học sinh
-    path("api/grading/", include("grading.urls")),              # ✅ Điểm số, học kỳ, báo cáo điểm
+    path("api/grading/", include("grading.urls")),              # Điểm số, học kỳ, báo cáo
 
-    # ✅ Trang root mặc định
+    #path("api/reporting/", include("reporting.urls")), khum cần nữa
+    # ✅ Trang root
     path("", home),
 ]
